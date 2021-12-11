@@ -10,5 +10,9 @@ namespace Loader
 		public double MaxToZero { get; set; }
 		public StandardisedThrusterSummary Acceleration { get; set; }
 		public StandardisedThrusterSummary AccelerationG { get; set; }
+
+		public double Pitch { get; set; }
+		public double Yaw { get; set; }
+		public double Roll { get; set; }
 	}
 }

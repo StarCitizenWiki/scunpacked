@@ -42,5 +42,7 @@ namespace scdb.Xml.Entities
 
 		[XmlAttribute]
 		public double precisionLandingMultiplier;
+
+		public MaxAngularVelocity maxAngularVelocity;
 	}
 }
