@@ -52,5 +52,7 @@ namespace scdb.Xml.Entities
 
 		[XmlAttribute]
 		public string vehicleRoleRef;
+
+		public MaxBoundingBoxSize maxBoundingBoxSize;
 	}
 }

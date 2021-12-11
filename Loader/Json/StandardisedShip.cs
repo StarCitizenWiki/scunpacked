@@ -15,6 +15,9 @@ namespace Loader
 		public int WeaponCrew { get; set; }
 		public int OperationsCrew { get; set; }
 		public double Mass { get; set; }
+		public double Width { get; set; }
+		public double Height { get; set; }
+		public double Length { get; set; }
 		public bool IsSpaceship { get; set; }
 		public bool IsGravlev { get; set; }
 		public bool IsVehicle { get; set; }
