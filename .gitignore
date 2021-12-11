@@ -3,3 +3,8 @@ obj
 packages
 .vscode
 Loader/.vs/
+.github
+api
+k8s
+website
+.idea
