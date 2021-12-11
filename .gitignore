@@ -8,3 +8,5 @@ api
 k8s
 website
 .idea
+redploy.bat
+scunpacked.code-workspace
