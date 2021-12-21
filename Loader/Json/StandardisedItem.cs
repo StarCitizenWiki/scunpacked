@@ -13,6 +13,10 @@ namespace Loader
 		public string Description { get; set; }
 		public StandardisedManufacturer Manufacturer { get; set; }
 		public List<string> Tags { get; set; }
+		public double Width { get; set; }
+		public double Height { get; set; }
+		public double Length { get; set; }
+		public double Volume { get; set; }
 		public StandardisedShield Shield { get; set; }
 		public StandardisedQuantumDrive QuantumDrive { get; set; }
 		public StandardisedPowerPlant PowerPlant { get; set; }

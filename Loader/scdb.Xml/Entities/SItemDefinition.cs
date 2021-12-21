@@ -30,5 +30,8 @@ namespace scdb.Xml.Entities
 		public string DisplayType;
 
 		public SCItemLocalization Localization;
+
+		public InventoryOccupancyVolume inventoryOccupancyVolume;
+		public InventoryOccupancyDimensions inventoryOccupancyDimensions;
 	}
 }
