@@ -61,6 +61,7 @@ namespace Loader
 			new ItemMatchRule { Matcher = (item) => TypeMatch(item, "Char_Armor_Legs.*"), Classifier = (t,s) => $"FPS.Armor.Legs" },
 			new ItemMatchRule { Matcher = (item) => TypeMatch(item, "Char_Armor_Torso.*"), Classifier = (t,s) => $"FPS.Armor.Torso" },
 			new ItemMatchRule { Matcher = (item) => TypeMatch(item, "Char_Armor_Undersuit.*"), Classifier = (t,s) => $"FPS.Armor.Undersuit" },
+            new ItemMatchRule { Matcher = (item) => TypeMatch(item, "Char_Armor_Backpack.*"), Classifier = (t,s) => $"FPS.Armor.Backpack" },
 
 			// Default catch all
 			new ItemMatchRule { Matcher = (item) => TypeMatch(item, "*.*"), Classifier = (t,s) => null }
