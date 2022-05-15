@@ -63,7 +63,7 @@ namespace Loader
 			{ "CasabaOutlet_Stanton1_L3", "Casaba Outlet, Hurston HUR-L3" },
 			{ "CasabaOutlet_Stanton1_L4", "Casaba Outlet, Hurston HUR-L4" },
 			{ "CasabaOutlet_Stanton1_L5", "Casaba Outlet, Hurston HUR-L5" },
-			{ "CasabaOutlet_Stanton1_LEO1", "Casaba Outlet, Everus Harbour" },
+			{ "CasabaOutlet_Stanton1_LEO1", "Casaba Outlet, Everus Harbor" },
 			{ "CasabaOutlet_Stanton2_L1", "Casaba Outlet, CRU-L1" },
 			{ "CasabaOutlet_Stanton2_L4", "Casaba Outlet, CRU-L4" },
 			{ "CasabaOutlet_Stanton2_L5", "Casaba Outlet, CRU-L5" },
