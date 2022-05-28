@@ -38,5 +38,6 @@ namespace scdb.Xml.Entities
 		public SItemPortCoreParams SItemPortContainerComponentParams;
 		public SCItemWeaponRegenPoolComponentParams SCItemWeaponRegenPoolComponentParams;
 		public MaxBoundingBoxSize maxBoundingBoxSize;
+		public SInventoryParams SInventoryParams;
 	}
 }

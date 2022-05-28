@@ -207,6 +207,7 @@ namespace Loader
 			{ "shubin_cluster_001_sand", "Shubin Mining Facility SCD-1, Daymar" },
 			{ "ShubinInterstellar_NewBabbage", "Shubin Interstellar, New Babbage" },
 			{ "Skutters_Armor_Weap_GrimHex", "Skutters, GrimHEX" },
+			{ "Skutters_GrimHex", "Skutters, GrimHEX" },
 			{ "Skutters_Food_GrimHex", "Skutters, GrimHEX" },
 			{ "stanton_1_hrst_001", "HDMS Edmond, Hurston" },
 			{ "stanton_1_hrst_002", "HDMS Oparei, Hurston" },
