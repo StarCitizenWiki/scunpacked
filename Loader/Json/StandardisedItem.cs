@@ -41,6 +41,7 @@ namespace Loader
 		public StandardisedRadar Radar { get; set; }
 		public StandardisedPing Ping { get; set; }
 		public StandardisedWeaponRegenPool WeaponRegenPool { get; set; }
+		public StandardisedPersonalInventory PersonalInventory { get; set; }
 
 		public List<StandardisedItemPort> Ports { get; set; }
 

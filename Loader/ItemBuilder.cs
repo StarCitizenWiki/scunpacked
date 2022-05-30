@@ -12,13 +12,15 @@ namespace Loader
 		ManufacturerService manufacturerSvc;
 		AmmoService ammoSvc;
 		EntityService entitySvc;
+		PersonalInventoryService inventorySvc;
 
-		public ItemBuilder(LocalisationService localisationSvc, ManufacturerService manufacturerSvc, AmmoService ammoSvc, EntityService entitySvc)
+		public ItemBuilder(LocalisationService localisationSvc, ManufacturerService manufacturerSvc, AmmoService ammoSvc, EntityService entitySvc, PersonalInventoryService inventorySvc)
 		{
 			this.localisationSvc = localisationSvc;
 			this.manufacturerSvc = manufacturerSvc;
 			this.ammoSvc = ammoSvc;
 			this.entitySvc = entitySvc;
+			this.inventorySvc = inventorySvc;
 		}
 
 		public StandardisedItem BuildItem(EntityClassDefinition entity)
@@ -64,6 +66,7 @@ namespace Loader
 			stdItem.Radar = BuildRadarInfo(entity);
 			stdItem.Ping = BuildPingInfo(entity);
 			stdItem.WeaponRegenPool = BuildWeaponRegenInfo(entity);
+			stdItem.PersonalInventory = BuildPersonalInventoryInfo(entity);
 
 			return stdItem;
 		}
@@ -662,6 +665,14 @@ namespace Loader
 			};
 
 			return info;
+		}
+
+		StandardisedPersonalInventory BuildPersonalInventoryInfo(EntityClassDefinition item)
+		{
+			var inventoryRef = item.Components.SCItemPersonalInventoryParams?.containerParams;
+			if (inventoryRef != null) return inventorySvc.GetPersonalInventory(inventoryRef);
+
+			return null;
 		}
 	}
 }

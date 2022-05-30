@@ -112,17 +112,26 @@ namespace Loader
 			var insurancePrices = insuranceLoader.Load();
 			var insuranceSvc = new InsuranceService(insurancePrices);
 
+			// PersonalInventories
+			Console.WriteLine("Load PersonalInventories");
+			var inventoryLoader = new PersonalInventoryLoader()
+			{
+				DataRoot = scDataRoot
+			};
+			var inventoryIndex = inventoryLoader.Load();
+			var inventorySvc = new PersonalInventoryService(inventoryIndex);
+
 			var xmlLoadoutLoader = new XmlLoadoutLoader { DataRoot = scDataRoot };
 			var manualLoadoutLoader = new ManualLoadoutLoader();
 			var loadoutLoader = new LoadoutLoader(xmlLoadoutLoader, manualLoadoutLoader);
-			var itemBuilder = new ItemBuilder(localisationSvc, manufacturerSvc, ammoSvc, entitySvc);
+			var itemBuilder = new ItemBuilder(localisationSvc, manufacturerSvc, ammoSvc, entitySvc, inventorySvc);
 			var itemInstaller = new ItemInstaller(entitySvc, loadoutLoader, itemBuilder);
 
 			// Items
 			if (doItems)
 			{
 				Console.WriteLine("Load Items");
-				var itemLoader = new ItemLoader(itemBuilder, manufacturerSvc, entitySvc, ammoSvc, itemInstaller, loadoutLoader)
+				var itemLoader = new ItemLoader(itemBuilder, manufacturerSvc, entitySvc, ammoSvc, itemInstaller, loadoutLoader, inventorySvc)
 				{
 					OutputFolder = outputRoot,
 					DataRoot = scDataRoot,

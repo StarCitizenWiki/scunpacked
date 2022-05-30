@@ -21,6 +21,7 @@ namespace Loader
 		AmmoService ammoSvc;
 		ItemInstaller itemInstaller;
 		LoadoutLoader loadoutLoader;
+		PersonalInventoryService inventorySvc;
 
 		// Don't dump items with these types
 		string[] type_avoids =
@@ -49,7 +50,7 @@ namespace Loader
 			"shopdisplay"
 		};
 
-		public ItemLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, EntityService entitySvc, AmmoService ammoSvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader)
+		public ItemLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, EntityService entitySvc, AmmoService ammoSvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, PersonalInventoryService inventorySvc)
 		{
 			this.itemBuilder = itemBuilder;
 			this.manufacturerSvc = manufacturerSvc;
@@ -58,6 +59,7 @@ namespace Loader
 			this.ammoSvc = ammoSvc;
 			this.itemInstaller = itemInstaller;
 			this.loadoutLoader = loadoutLoader;
+			this.inventorySvc = inventorySvc;
 		}
 
 		public List<ItemIndexEntry> Load(string typeFilter = null)
@@ -99,6 +101,12 @@ namespace Loader
 					damageResistances = damageMacro?.damageResistance;
 				}
 
+				StandardisedPersonalInventory personalInventory = null;
+				if (!String.IsNullOrEmpty(entity.Components?.SCItemPersonalInventoryParams?.containerParams))
+				{
+					personalInventory = inventorySvc.GetPersonalInventory(entity.Components.SCItemPersonalInventoryParams.containerParams);
+				}
+
 				var stdItem = itemBuilder.BuildItem(entity);
 				var loadout = loadoutLoader.Load(entity);
 				itemInstaller.InstallLoadout(stdItem, loadout);
@@ -119,7 +127,8 @@ namespace Loader
 					{
 						Entity = entity,
 					},
-					damageResistances = damageResistances
+					damageResistances = damageResistances,
+					personalInventory = personalInventory,
 				});
 				File.WriteAllText(jsonFilename, json);
 			}
