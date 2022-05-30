@@ -32,12 +32,22 @@ namespace Loader
 				var personalinventory = parser.Parse(entityFilename);
 				if (personalinventory == null) continue;
 
+				double scu = 0;
+
+				if (personalinventory.capacity?.SStandardCargoUnit?.standardCargoUnits != null) {
+					scu  = personalinventory.capacity.SStandardCargoUnit.standardCargoUnits;
+				} else if (personalinventory.capacity?.SCentiCargoUnit?.centiSCU != null) {
+					scu = personalinventory.capacity.SCentiCargoUnit.centiSCU * Math.Pow(10, -2);
+				} else if (personalinventory.capacity?.SMicroCargoUnit?.microSCU != null) {
+					scu = personalinventory.capacity.SMicroCargoUnit.microSCU * Math.Pow(10, -6);
+				}
+
 				var indexEntry = new PersonalInventoryIndexEntry
 				{
 					x = personalinventory?.interiorDimensions?.x ?? 0,
 					y = personalinventory?.interiorDimensions?.y ?? 0,
 					z = personalinventory?.interiorDimensions?.z ?? 0,
-					scu = personalinventory.capacity?.SStandardCargoUnit?.standardCargoUnits ?? 0,
+					scu = scu,
 					reference = personalinventory?.__ref ?? null
 				};
 
