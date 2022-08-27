@@ -28,7 +28,6 @@ namespace Loader
 		{
 			"UNDEFINED",
 			"airtrafficcontroller",
-			"bottle",
 			"button",
 			"char_accessory_head",
 			"char_body",
@@ -42,7 +41,6 @@ namespace Loader
 			"char_skin_color",
 			"cloth",
 			"debris",
-			"drink",
 			"flair_floor",
 			"flair_surface",
 			"flair_wall",
