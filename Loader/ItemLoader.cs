@@ -29,7 +29,6 @@ namespace Loader
 			"UNDEFINED",
 			"airtrafficcontroller",
 			"button",
-			"char_accessory_head",
 			"char_body",
 			"char_head",
 			"char_hair_color",

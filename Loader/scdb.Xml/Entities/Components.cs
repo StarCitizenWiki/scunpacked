@@ -41,5 +41,6 @@ namespace scdb.Xml.Entities
 		public MaxBoundingBoxSize maxBoundingBoxSize;
 		public SInventoryParams SInventoryParams;
 		public SCItemPersonalInventoryParams SCItemPersonalInventoryParams;
+		public SCItemConsumableParams SCItemConsumableParams;
 	}
 }

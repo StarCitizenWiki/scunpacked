@@ -37,12 +37,9 @@ namespace Loader
 			"hangar",
 			"holoui",
 			"innerthought_dummies",
-			"lootables",
 			"mission_entities",
 			"missionstorage",
 			"placeholder",
-			"prop",
-			"shopdisplays",
 			"spawning",
 			"starmarine",
 			"template"

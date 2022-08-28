@@ -18,5 +18,7 @@ namespace scdb.Xml.Entities
 
 		[XmlAttribute]
 		public bool IsUnrefinedElement;
+
+		public occupancy occupancy;
 	}
 }
