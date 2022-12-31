@@ -16,15 +16,15 @@ namespace Loader
 		{
 			var output = new Dictionary<string, StandardisedInsurance>();
 
-			var insurance = Parse<ShipInsuranceRecord>(Path.Combine(DataRoot, @"data\libs\foundry\records\shipinsurancerecord\shipinsurance.xml"));
+			var insurance = Parse<ShipInsuranceRecord>(Path.Combine(DataRoot, @"data\libs\foundry\records\shipinsurancerecord\shipinsurancepolicy_default.xml"));
 			foreach (var record in insurance.allShips)
 			{
 				if (output.ContainsKey(record.shipEntityClassName)) continue; // Fix for Redeemer appearing twice
 
 				output.Add(record.shipEntityClassName, new StandardisedInsurance
 				{
-					StandardClaimTime = record.baseWaitTimeMinutes,
-					ExpeditedClaimTime = record.mandatoryWaitTimeMinutes,
+					StandardClaimTime = record.mandatoryWaitTimeMinutes,
+					ExpeditedClaimTime = record.baseWaitTimeMinutes,
 					ExpeditedCost = record.baseExpeditingFee
 				});
 			}

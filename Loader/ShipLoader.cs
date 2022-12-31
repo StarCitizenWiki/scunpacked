@@ -545,7 +545,14 @@ namespace Loader
 					.Where(x => x.InstalledItem?.CargoGrid != null)
 					.Where(x => !x.InstalledItem.CargoGrid.MiningOnly)
 					.Sum(x => x.InstalledItem.CargoGrid.Capacity)),
-				Insurance = insuranceSvc.GetInsurance(entity.ClassName)
+			//	Insurance = insuranceSvc.GetInsurance(entity.ClassName)
+			};
+
+			shipSummary.Insurance = new StandardisedInsurance
+			{
+				ExpeditedCost = entity.StaticEntityClassData?.SEntityInsuranceProperties?.shipInsuranceParams?.baseExpeditingFee ?? 0,
+				ExpeditedClaimTime = entity.StaticEntityClassData?.SEntityInsuranceProperties?.shipInsuranceParams?.baseWaitTimeMinutes ?? 0,
+				StandardClaimTime = entity.StaticEntityClassData?.SEntityInsuranceProperties?.shipInsuranceParams?.mandatoryWaitTimeMinutes ?? 0,
 			};
 
 			shipSummary.IsVehicle = entity.Components?.VehicleComponentParams.vehicleCareer == "@vehicle_focus_ground";
