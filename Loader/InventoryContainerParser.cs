@@ -7,7 +7,7 @@ using scdb.Xml.Entities;
 
 namespace Loader
 {
-	public class PersonalInventoryParser
+	public class InventoryContainerParser
 	{
 		public InventoryContainer Parse(string fullXmlPath)
 		{

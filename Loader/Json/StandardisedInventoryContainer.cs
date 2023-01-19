@@ -1,6 +1,6 @@
 namespace Loader
 {
-	public class StandardisedPersonalInventory
+	public class StandardisedInventoryContainer
 	{
 		public double SCU { get; set; }
 		public double x { get; set; }

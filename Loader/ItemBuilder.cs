@@ -12,15 +12,15 @@ namespace Loader
 		ManufacturerService manufacturerSvc;
 		AmmoService ammoSvc;
 		EntityService entitySvc;
-		PersonalInventoryService inventorySvc;
+		InventoryContainerService _inventoryContainerSvc;
 
-		public ItemBuilder(LocalisationService localisationSvc, ManufacturerService manufacturerSvc, AmmoService ammoSvc, EntityService entitySvc, PersonalInventoryService inventorySvc)
+		public ItemBuilder(LocalisationService localisationSvc, ManufacturerService manufacturerSvc, AmmoService ammoSvc, EntityService entitySvc, InventoryContainerService inventoryContainerSvc)
 		{
 			this.localisationSvc = localisationSvc;
 			this.manufacturerSvc = manufacturerSvc;
 			this.ammoSvc = ammoSvc;
 			this.entitySvc = entitySvc;
-			this.inventorySvc = inventorySvc;
+			this._inventoryContainerSvc = inventoryContainerSvc;
 		}
 
 		public StandardisedItem BuildItem(EntityClassDefinition entity)
@@ -66,7 +66,7 @@ namespace Loader
 			stdItem.Radar = BuildRadarInfo(entity);
 			stdItem.Ping = BuildPingInfo(entity);
 			stdItem.WeaponRegenPool = BuildWeaponRegenInfo(entity);
-			stdItem.PersonalInventory = BuildPersonalInventoryInfo(entity);
+			stdItem.InventoryContainer = BuildPersonalInventoryInfo(entity);
 
 			return stdItem;
 		}
@@ -667,10 +667,10 @@ namespace Loader
 			return info;
 		}
 
-		StandardisedPersonalInventory BuildPersonalInventoryInfo(EntityClassDefinition item)
+		StandardisedInventoryContainer BuildPersonalInventoryInfo(EntityClassDefinition item)
 		{
-			var inventoryRef = item.Components.SCItemPersonalInventoryParams?.containerParams;
-			if (inventoryRef != null) return inventorySvc.GetPersonalInventory(inventoryRef);
+			var inventoryRef = item.Components.SCItemInventoryContainerComponentParams?.containerParams;
+			if (inventoryRef != null) return _inventoryContainerSvc.GetInventoryContainer(inventoryRef);
 
 			return null;
 		}

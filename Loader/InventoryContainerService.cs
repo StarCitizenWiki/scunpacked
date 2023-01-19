@@ -4,16 +4,16 @@ using System.Linq;
 
 namespace Loader
 {
-	public class PersonalInventoryService
+	public class InventoryContainerService
 	{
-		List<PersonalInventoryIndexEntry> inventories;
+		List<InventoryContainerIndexEntry> inventories;
 
-		public PersonalInventoryService(List<PersonalInventoryIndexEntry> inventories)
+		public InventoryContainerService(List<InventoryContainerIndexEntry> inventories)
 		{
 			this.inventories = inventories;
 		}
 
-		public StandardisedPersonalInventory GetPersonalInventory(string guid)
+		public StandardisedInventoryContainer GetInventoryContainer(string guid)
 		{
 			// Try and find by the reference guid
 			var found = inventories.FirstOrDefault(x => x.reference == guid);
@@ -21,7 +21,7 @@ namespace Loader
 			// If that didn't work, then give up
 			if (found == null) return null;
 
-			return new StandardisedPersonalInventory
+			return new StandardisedInventoryContainer
 			{
 				SCU = found.scu,
 				x = found.x,

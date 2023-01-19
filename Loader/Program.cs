@@ -115,12 +115,12 @@ namespace Loader
 
 			// PersonalInventories
 			Console.WriteLine("Load PersonalInventories");
-			var inventoryLoader = new PersonalInventoryLoader()
+			var inventoryLoader = new InventoryContainerLoader()
 			{
 				DataRoot = scDataRoot
 			};
 			var inventoryIndex = inventoryLoader.Load();
-			var inventorySvc = new PersonalInventoryService(inventoryIndex);
+			var inventorySvc = new InventoryContainerService(inventoryIndex);
 
 			var xmlLoadoutLoader = new XmlLoadoutLoader { DataRoot = scDataRoot };
 			var manualLoadoutLoader = new ManualLoadoutLoader();

@@ -3,10 +3,9 @@ using System.Xml.Serialization;
 
 namespace scdb.Xml.Entities
 {
-	public class SCItemPersonalInventoryParams
+	public class SCItemInventoryContainerComponentParams
 	{
 		[XmlAttribute]
 		public string containerParams;
-		public Capacity capacity;
 	}
 }

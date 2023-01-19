@@ -1,6 +1,6 @@
 namespace Loader
 {
-	public class PersonalInventoryIndexEntry
+	public class InventoryContainerIndexEntry
 	{
 		public string reference;
 

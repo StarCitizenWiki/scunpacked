@@ -1,5 +1,4 @@
-﻿using System.Xml;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace scdb.Xml.Entities
 {
@@ -9,6 +8,6 @@ namespace scdb.Xml.Entities
 		public string __ref;
 
 		public InteriorDimensions interiorDimensions;
-		public Capacity capacity;
+		public InventoryType inventoryType;
 	}
 }

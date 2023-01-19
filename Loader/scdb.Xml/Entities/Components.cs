@@ -40,7 +40,7 @@ namespace scdb.Xml.Entities
 		public SCItemWeaponRegenPoolComponentParams SCItemWeaponRegenPoolComponentParams;
 		public MaxBoundingBoxSize maxBoundingBoxSize;
 		public SInventoryParams SInventoryParams;
-		public SCItemPersonalInventoryParams SCItemPersonalInventoryParams;
+		public SCItemInventoryContainerComponentParams SCItemInventoryContainerComponentParams;
 		public SCItemConsumableParams SCItemConsumableParams;
 	}
 }
