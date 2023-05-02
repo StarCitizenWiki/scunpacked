@@ -13,7 +13,9 @@ namespace scdb.Xml.Entities
 		public bool canBeReclosed;
 		[XmlAttribute]
 		public bool discardWhenConsumed;
+		[XmlAttribute]
+		public bool containerClosed;
 
-		public consumableVolume consumableVolume;
+		public Capacity Volume;
 	}
 }

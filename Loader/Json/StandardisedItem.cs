@@ -4,6 +4,7 @@ namespace Loader
 {
 	public class StandardisedItem
 	{
+		public string UUID { get; set; }
 		public string ClassName { get; set; }
 		public int Size { get; set; }
 		public int Grade { get; set; }
@@ -17,6 +18,7 @@ namespace Loader
 		public double Height { get; set; }
 		public double Length { get; set; }
 		public double Volume { get; set; }
+		public StandardisedUiDimensionOverrides DimensionOverrides { get; set; }
 		public StandardisedShield Shield { get; set; }
 		public StandardisedQuantumDrive QuantumDrive { get; set; }
 		public StandardisedPowerPlant PowerPlant { get; set; }
@@ -42,6 +44,8 @@ namespace Loader
 		public StandardisedPing Ping { get; set; }
 		public StandardisedWeaponRegenPool WeaponRegenPool { get; set; }
 		public StandardisedInventoryContainer InventoryContainer { get; set; }
+		public StandardisedTemperatureResistance TemperatureResistance { get; set; }
+		public StandardisedConsumableParams Food { get; set; }
 
 		public List<StandardisedItemPort> Ports { get; set; }
 

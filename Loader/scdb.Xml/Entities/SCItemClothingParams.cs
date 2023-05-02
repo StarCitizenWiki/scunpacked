@@ -10,9 +10,9 @@ namespace scdb.Xml.Entities
 	public class TemperatureResistance
 	{
 		[XmlAttribute]
-		public string MinResistance;
+		public double MinResistance;
 
 		[XmlAttribute]
-		public string MaxResistance;
+		public double MaxResistance;
 	}
 }

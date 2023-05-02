@@ -6,5 +6,6 @@ namespace scdb.Xml.Entities
 	public class InventoryType
 	{
 		public InventoryClosedContainerType InventoryClosedContainerType;
+		public InventoryOpenContainerType InventoryOpenContainerType;
 	}
 }

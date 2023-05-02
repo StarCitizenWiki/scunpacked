@@ -25,15 +25,19 @@ namespace Loader
 
 		public StandardisedItem BuildItem(EntityClassDefinition entity)
 		{
+			var volume =
+				ConvertToSCU(entity.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyVolume) ?? 0;
+
 			var stdItem = new StandardisedItem
 			{
+				UUID = entity.__ref,
 				ClassName = entity.ClassName,
 				Size = entity.Components.SAttachableComponentParams?.AttachDef.Size ?? 0,
 				Grade = entity.Components.SAttachableComponentParams?.AttachDef.Grade ?? 0,
 				Width = entity.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyDimensions?.x ?? 0,
 				Length = entity.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyDimensions?.y ?? 0,
 				Height = entity.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyDimensions?.z ?? 0,
-				Volume = entity.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyVolume?.SMicroCargoUnit?.microSCU ?? 0,
+				Volume = volume,
 				Type = BuildTypeName(entity.Components.SAttachableComponentParams?.AttachDef.Type, entity.Components.SAttachableComponentParams?.AttachDef.SubType),
 				Name = localisationSvc.GetText(entity.Components.SAttachableComponentParams?.AttachDef.Localization.Name, entity.ClassName),
 				Description = localisationSvc.GetText(entity.Components.SAttachableComponentParams?.AttachDef.Localization.Description),
@@ -67,6 +71,9 @@ namespace Loader
 			stdItem.Ping = BuildPingInfo(entity);
 			stdItem.WeaponRegenPool = BuildWeaponRegenInfo(entity);
 			stdItem.InventoryContainer = BuildPersonalInventoryInfo(entity);
+			stdItem.DimensionOverrides = BuildUiDimensionOverrides(entity);
+			stdItem.TemperatureResistance = BuildTemperatureResistance(entity);
+			stdItem.Food = BuildFoodInfo(entity);
 
 			return stdItem;
 		}
@@ -673,6 +680,74 @@ namespace Loader
 			if (inventoryRef != null) return _inventoryContainerSvc.GetInventoryContainer(inventoryRef);
 
 			return null;
+		}
+
+		StandardisedUiDimensionOverrides BuildUiDimensionOverrides(EntityClassDefinition item)
+		{
+			var uiOverride = item.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyDimensionsUIOverride?.Vec3;
+			if (uiOverride != null)
+			{
+				return new StandardisedUiDimensionOverrides
+				{
+					Width = uiOverride.x,
+					Height = uiOverride.z,
+					Depth = uiOverride.y,
+				};
+			};
+
+			return null;
+		}
+
+		StandardisedTemperatureResistance BuildTemperatureResistance(EntityClassDefinition item)
+		{
+			var resistance = item.Components?.SCItemClothingParams?.TemperatureResistance;
+			if (resistance != null)
+			{
+				return new StandardisedTemperatureResistance
+				{
+					Min = resistance.MinResistance,
+					Max = resistance.MaxResistance
+				};
+			};
+
+			return null;
+		}
+
+		StandardisedConsumableParams BuildFoodInfo(EntityClassDefinition item)
+		{
+			var consumableParams = item.Components?.SCItemConsumableParams;
+			if (consumableParams != null)
+			{
+				var consumeVolume = consumableParams.Volume;
+				var scu = ConvertToSCU(consumeVolume) ?? 1;
+
+				return new StandardisedConsumableParams
+				{
+					oneShotConsume = consumableParams.oneShotConsume,
+					consumeVolume = scu,
+					containerClosed = consumableParams.containerClosed,
+					canBeReclosed = consumableParams.canBeReclosed,
+					discardWhenConsumed = consumableParams.discardWhenConsumed,
+					containerTypeTag = consumableParams.containerTypeTag
+				};
+			}
+
+			return null;
+		}
+
+		private double? ConvertToSCU(dynamic volume)
+		{
+			double? scu = null;
+
+			if (volume?.SStandardCargoUnit?.standardCargoUnits != null) {
+				scu  = volume.SStandardCargoUnit.standardCargoUnits;
+			} else if (volume?.SCentiCargoUnit?.centiSCU != null) {
+				scu = volume.SCentiCargoUnit.centiSCU * Math.Pow(10, -2);
+			} else if (volume?.SMicroCargoUnit?.microSCU != null) {
+				scu = volume.SMicroCargoUnit.microSCU * Math.Pow(10, -6);
+			}
+
+			return scu;
 		}
 	}
 }

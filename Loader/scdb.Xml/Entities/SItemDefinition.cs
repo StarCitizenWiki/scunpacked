@@ -31,7 +31,8 @@ namespace scdb.Xml.Entities
 
 		public SCItemLocalization Localization;
 
-		public InventoryOccupancyVolume inventoryOccupancyVolume;
+		public Capacity inventoryOccupancyVolume;
 		public InventoryOccupancyDimensions inventoryOccupancyDimensions;
+		public InventoryOccupancyDimensionsUIOverride inventoryOccupancyDimensionsUIOverride;
 	}
 }
