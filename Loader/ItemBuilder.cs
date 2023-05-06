@@ -392,10 +392,21 @@ namespace Loader
 			return new StandardisedIfcs
 			{
 				MaxSpeed = ifcs.maxSpeed,
-				MaxAfterburnSpeed = ifcs.maxAfterburnSpeed,
+				MaxAfterburnSpeed = ifcs.scmSpeed,
 				Pitch = ifcs.maxAngularVelocity.x,
                 Yaw = ifcs.maxAngularVelocity.z,
-                Roll = ifcs.maxAngularVelocity.y
+                Roll = ifcs.maxAngularVelocity.y,
+                Afterburner = new StandardisedAfterburner
+                {
+	                SpoolUpTime = ifcs.afterburner.afterburnerSpoolUpTime,
+	                CapacitorThresholdRatio = ifcs.afterburner.afterburnerCapacitorThresholdRatio,
+	                CapacitorMax = ifcs.afterburner.capacitorMax,
+	                CapacitorAfterburnerIdleCost = ifcs.afterburner.capacitorAfterburnerIdleCost,
+	                CapacitorAfterburnerLinearCost = ifcs.afterburner.capacitorAfterburnerLinearCost,
+	                CapacitorAfterburnerAngularCost = ifcs.afterburner.capacitorAfterburnerAngularCost,
+	                CapacitorRegenDelayAfterUse = ifcs.afterburner.capacitorRegenDelayAfterUse,
+	                CapacitorRegenPerSec = ifcs.afterburner.capacitorRegenPerSec,
+                }
 			};
 		}
 

@@ -8,7 +8,7 @@ namespace scdb.Xml.Entities
 		public double maxSpeed;
 
 		[XmlAttribute]
-		public double maxAfterburnSpeed;
+		public double scmSpeed;
 
 		[XmlAttribute]
 		public double torqueDistanceThreshold;
@@ -44,5 +44,7 @@ namespace scdb.Xml.Entities
 		public double precisionLandingMultiplier;
 
 		public MaxAngularVelocity maxAngularVelocity;
+
+		public Afterburner afterburner;
 	}
 }
