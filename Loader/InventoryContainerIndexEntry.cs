@@ -9,5 +9,6 @@ namespace Loader
 		public double z;
 
 		public double scu;
+		public double unit;
 	}
 }

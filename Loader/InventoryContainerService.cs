@@ -24,9 +24,10 @@ namespace Loader
 			return new StandardisedInventoryContainer
 			{
 				SCU = found.scu,
+				unit = found.unit,
 				x = found.x,
 				y = found.y,
-				z = found.z
+				z = found.z,
 			};
 		}
 	}

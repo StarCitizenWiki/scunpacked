@@ -35,12 +35,19 @@ namespace Loader
 				double scu = 0;
 				var capacity = inventoryContainer.inventoryType?.InventoryClosedContainerType?.capacity;
 
-				if (capacity?.SStandardCargoUnit?.standardCargoUnits != null) {
+				double unit = 0;
+				if (capacity?.SStandardCargoUnit?.standardCargoUnits != null)
+				{
+					unit = 0;
 					scu  = capacity.SStandardCargoUnit.standardCargoUnits;
-				} else if (capacity?.SCentiCargoUnit?.centiSCU != null) {
-					scu = capacity.SCentiCargoUnit.centiSCU * Math.Pow(10, -2);
-				} else if (capacity?.SMicroCargoUnit?.microSCU != null) {
-					scu = capacity.SMicroCargoUnit.microSCU * Math.Pow(10, -6);
+				} else if (capacity?.SCentiCargoUnit?.centiSCU != null)
+				{
+					unit = 2;
+					scu = capacity.SCentiCargoUnit.centiSCU * Math.Pow(10, -unit);
+				} else if (capacity?.SMicroCargoUnit?.microSCU != null)
+				{
+					unit = 6;
+					scu = capacity.SMicroCargoUnit.microSCU * Math.Pow(10, -unit);
 				}
 
 				var indexEntry = new InventoryContainerIndexEntry
@@ -49,6 +56,7 @@ namespace Loader
 					y = inventoryContainer?.interiorDimensions?.y ?? 0,
 					z = inventoryContainer?.interiorDimensions?.z ?? 0,
 					scu = scu,
+					unit = unit,
 					reference = inventoryContainer?.__ref
 				};
 
