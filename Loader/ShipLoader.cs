@@ -604,8 +604,8 @@ namespace Loader
 			var G = 9.80665f;
 			shipSummary.FlightCharacteristics = new StandardisedFlightCharacteristics
 			{
-				ScmSpeed = ifcs?.InstalledItem.Ifcs.MaxSpeed ?? 0,
-				MaxSpeed = ifcs?.InstalledItem.Ifcs.MaxAfterburnSpeed ?? 0,
+				ScmSpeed = ifcs?.InstalledItem.Ifcs.MaxAfterburnSpeed ?? 0,
+				MaxSpeed = ifcs?.InstalledItem.Ifcs.MaxSpeed ?? 0,
 				Acceleration = new StandardisedThrusterSummary
 				{
 					Main = shipSummary.Propulsion.ThrustCapacity.Main / shipSummary.Mass,
