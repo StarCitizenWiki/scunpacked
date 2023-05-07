@@ -10,7 +10,8 @@ namespace Loader
 		public string Career { get; set; }
 		public string Role { get; set; }
 		public int Size { get; set; }
-		public int Cargo { get; set; }
+		public double Cargo { get; set; }
+		public StandardisedInventoryContainer Inventory { get; set; }
 		public int Crew { get; set; }
 		public int WeaponCrew { get; set; }
 		public int OperationsCrew { get; set; }

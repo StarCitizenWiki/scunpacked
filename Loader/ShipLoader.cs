@@ -75,8 +75,9 @@ namespace Loader
 		ItemInstaller itemInstaller;
 		LoadoutLoader loadoutLoader;
 		InsuranceService insuranceSvc;
+		InventoryContainerService inventoryContainerSvc;
 
-		public ShipLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, LocalisationService localisationSvc, EntityService entitySvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, InsuranceService insuranceSvc)
+		public ShipLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, LocalisationService localisationSvc, EntityService entitySvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, InsuranceService insuranceSvc, InventoryContainerService inventoryContainerSvc)
 		{
 			this.itemBuilder = itemBuilder;
 			this.manufacturerSvc = manufacturerSvc;
@@ -85,6 +86,7 @@ namespace Loader
 			this.itemInstaller = itemInstaller;
 			this.loadoutLoader = loadoutLoader;
 			this.insuranceSvc = insuranceSvc;
+			this.inventoryContainerSvc = inventoryContainerSvc;
 		}
 
 		public List<(ShipIndexEntry, StandardisedShip)> Load(string shipFilter)
@@ -525,6 +527,13 @@ namespace Loader
 
 		StandardisedShip BuildShipSummary(EntityClassDefinition entity, List<StandardisedPart> parts, StandardisedPortSummary portSummary)
 		{
+			StandardisedInventoryContainer inventorySize = null;
+			if (entity.Components.VehicleComponentParams.inventoryContainerParams.Length > 0)
+			{
+				inventorySize = inventoryContainerSvc.GetInventoryContainer(entity.Components.VehicleComponentParams
+					.inventoryContainerParams);
+			}
+
 			var shipSummary = new StandardisedShip
 			{
 				ClassName = entity.ClassName,
@@ -545,6 +554,7 @@ namespace Loader
 					.Where(x => x.InstalledItem?.CargoGrid != null)
 					.Where(x => !x.InstalledItem.CargoGrid.MiningOnly)
 					.Sum(x => x.InstalledItem.CargoGrid.Capacity)),
+				Inventory = inventorySize,
 			//	Insurance = insuranceSvc.GetInsurance(entity.ClassName)
 			};
 

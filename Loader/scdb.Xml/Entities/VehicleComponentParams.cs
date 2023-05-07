@@ -53,6 +53,9 @@ namespace scdb.Xml.Entities
 		[XmlAttribute]
 		public string vehicleRoleRef;
 
+		[XmlAttribute]
+		public string inventoryContainerParams;
+
 		public MaxBoundingBoxSize maxBoundingBoxSize;
 	}
 }

@@ -144,7 +144,7 @@ namespace Loader
 			if (doShips)
 			{
 				Console.WriteLine("Load Ships and Vehicles");
-				var shipLoader = new ShipLoader(itemBuilder, manufacturerSvc, localisationSvc, entitySvc, itemInstaller, loadoutLoader, null)//insuranceSvc)
+				var shipLoader = new ShipLoader(itemBuilder, manufacturerSvc, localisationSvc, entitySvc, itemInstaller, loadoutLoader, null, inventorySvc)//insuranceSvc)
 				{
 					OutputFolder = outputRoot,
 					DataRoot = scDataRoot,
