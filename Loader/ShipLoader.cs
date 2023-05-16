@@ -558,6 +558,11 @@ namespace Loader
 			//	Insurance = insuranceSvc.GetInsurance(entity.ClassName)
 			};
 
+			if (shipSummary.ClassName.Contains("Carrack"))
+			{
+				shipSummary.Mass = 4397858;
+			}
+
 			shipSummary.Insurance = new StandardisedInsurance
 			{
 				ExpeditedCost = entity.StaticEntityClassData?.SEntityInsuranceProperties?.shipInsuranceParams?.baseExpeditingFee ?? 0,
@@ -638,6 +643,9 @@ namespace Loader
 			shipSummary.FlightCharacteristics.ZeroToMax = shipSummary.FlightCharacteristics.MaxSpeed / shipSummary.FlightCharacteristics.Acceleration.Main;
 			shipSummary.FlightCharacteristics.ScmToZero = shipSummary.FlightCharacteristics.ScmSpeed / shipSummary.FlightCharacteristics.Acceleration.Retro;
 			shipSummary.FlightCharacteristics.MaxToZero = shipSummary.FlightCharacteristics.MaxSpeed / shipSummary.FlightCharacteristics.Acceleration.Retro;
+
+			shipSummary.Health =
+				FindParts(parts, (x) => x.MaximumDamage > 0).Sum(x => x.Item1.MaximumDamage) ?? 0;
 
 			// Destruction damage
 			shipSummary.DamageBeforeDestruction =
