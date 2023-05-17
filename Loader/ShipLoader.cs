@@ -566,8 +566,8 @@ namespace Loader
 			shipSummary.Insurance = new StandardisedInsurance
 			{
 				ExpeditedCost = entity.StaticEntityClassData?.SEntityInsuranceProperties?.shipInsuranceParams?.baseExpeditingFee ?? 0,
-				ExpeditedClaimTime = entity.StaticEntityClassData?.SEntityInsuranceProperties?.shipInsuranceParams?.baseWaitTimeMinutes ?? 0,
-				StandardClaimTime = entity.StaticEntityClassData?.SEntityInsuranceProperties?.shipInsuranceParams?.mandatoryWaitTimeMinutes ?? 0,
+				ExpeditedClaimTime = entity.StaticEntityClassData?.SEntityInsuranceProperties?.shipInsuranceParams?.mandatoryWaitTimeMinutes ?? 0,
+				StandardClaimTime = entity.StaticEntityClassData?.SEntityInsuranceProperties?.shipInsuranceParams?.baseWaitTimeMinutes ?? 0,
 			};
 
 			shipSummary.IsVehicle = entity.Components?.VehicleComponentParams.vehicleCareer == "@vehicle_focus_ground";
