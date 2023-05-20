@@ -48,22 +48,6 @@ namespace Loader
 			"derelict",
 			"drone",
 			"eaobjectivedestructable",
-
-			// Skin variants
-			"pink",
-			"yellow",
-			"emerald",
-			"dunestalker",
-			"snowblind",
-			"shipshowdown",
-			"showdown",
-			"citizencon2018",
-			"citizencon",
-			"pirate",
-			"talus",
-			"carbon",
-			"bis2950",
-			"fleetweek"
 		};
 
 		SortedSet<string> AcceptTypes = new SortedSet<string>();

@@ -44,7 +44,6 @@ namespace Loader
 			"flair_surface",
 			"flair_wall",
 			"removablechip",
-			"shopdisplay"
 		};
 
 		public ItemLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, EntityService entitySvc, AmmoService ammoSvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, InventoryContainerService inventoryContainerSvc)
