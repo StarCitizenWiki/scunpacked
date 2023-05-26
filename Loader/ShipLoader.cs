@@ -636,10 +636,10 @@ namespace Loader
 			{
 				shipSummary.DriveCharacteristics = new StandardisedDriveCharacteristics
 				{
-					TopSpeed = vehicle?.MovementParams.ArcadeWheeled.Handling.Power.topSpeed ?? 0,
-					ReverseSpeed = vehicle?.MovementParams.ArcadeWheeled.Handling.Power.reverseSpeed ?? 0,
-					Acceleration = vehicle?.MovementParams.ArcadeWheeled.Handling.Power.acceleration ?? 0,
-					Decceleration = vehicle?.MovementParams.ArcadeWheeled.Handling.Power.decceleration ?? 0,
+					TopSpeed = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.topSpeed ?? 0,
+					ReverseSpeed = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.reverseSpeed ?? 0,
+					Acceleration = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.acceleration ?? 0,
+					Decceleration = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.decceleration ?? 0
 				};
 			}
 
