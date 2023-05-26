@@ -389,7 +389,7 @@ namespace Loader
 			var ifcs = item.Components.IFCSParams;
 			if (ifcs == null) return null;
 
-			return new E
+			return new StandardisedIfcs
 			{
 				MaxSpeed = ifcs.maxSpeed,
 				ScmSpeed = ifcs.scmSpeed,
