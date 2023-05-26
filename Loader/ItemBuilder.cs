@@ -389,10 +389,10 @@ namespace Loader
 			var ifcs = item.Components.IFCSParams;
 			if (ifcs == null) return null;
 
-			return new StandardisedIfcs
+			return new E
 			{
 				MaxSpeed = ifcs.maxSpeed,
-				MaxAfterburnSpeed = ifcs.scmSpeed,
+				ScmSpeed = ifcs.scmSpeed,
 				Pitch = ifcs.maxAngularVelocity.x,
                 Yaw = ifcs.maxAngularVelocity.z,
                 Roll = ifcs.maxAngularVelocity.y,
