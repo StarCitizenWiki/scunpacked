@@ -599,7 +599,7 @@ namespace Loader
 			shipSummary.Propulsion.ManeuveringTimeTillEmpty = shipSummary.Propulsion.FuelCapacity / (shipSummary.Propulsion.FuelUsage.Main + shipSummary.Propulsion.FuelUsage.Maneuvering / 2 - shipSummary.Propulsion.FuelIntakeRate);
 
 			// Flight characteristics
-			if (shipSummary.IsSpaceship) 
+			if (shipSummary.IsSpaceship || shipSummary.IsGravlev) 
 			{
 				var (ifcs, _) = FindItemPorts(parts, x => x.InstalledItem?.Ifcs != null).FirstOrDefault();
 				var G = 9.80665f;
