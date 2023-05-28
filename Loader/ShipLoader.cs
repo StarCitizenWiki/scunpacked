@@ -139,7 +139,7 @@ namespace Loader
 					Raw = new
 					{
 						Entity = entity,
-						Vehicle = vehicle
+						Vehicle = vehicle,
 					}
 				});
 				File.WriteAllText(Path.Combine(OutputFolder, "ships", $"{entity.ClassName.ToLower()}.json"), v1json);

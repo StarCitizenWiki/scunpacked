@@ -8,6 +8,9 @@ namespace scdb.Xml.Entities
 		public double TemperatureToIR;
 
 		[XmlAttribute]
+		public double StartIRTemperature;
+
+		[XmlAttribute]
 		public double OverpowerHeat;
 
 		[XmlAttribute]
