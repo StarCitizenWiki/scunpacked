@@ -35,5 +35,7 @@ namespace scdb.Xml.Entities
 		public string controllableTags;
 
 		public SItemPortDefTypes[] Types;
+
+		public string EquippedItemUuid;
 	}
 }

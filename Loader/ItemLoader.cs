@@ -106,6 +106,7 @@ namespace Loader
 				var stdItem = itemBuilder.BuildItem(entity);
 				var loadout = loadoutLoader.Load(entity);
 				itemInstaller.InstallLoadout(stdItem, loadout);
+				itemInstaller.InstallLoadout(entity, loadout);
 
 				stdItem.Classification = item.classification;
 				item.stdItem = stdItem;

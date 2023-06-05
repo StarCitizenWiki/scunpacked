@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using scdb.Xml.Entities;
 
 namespace Loader
 {
@@ -25,6 +26,19 @@ namespace Loader
 			}
 		}
 
+		public void InstallLoadout(EntityClassDefinition item, List<StandardisedLoadoutEntry> loadout)
+		{
+			if (item?.Components?.SItemPortContainerComponentParams?.Ports == null)
+			{
+				return;
+			}
+
+			foreach (var port in item.Components?.SItemPortContainerComponentParams?.Ports)
+			{
+				InstallLoadout(port, loadout);
+			}
+		}
+
 		public void InstallLoadout(List<StandardisedPart> parts, List<StandardisedLoadoutEntry> loadout)
 		{
 			foreach (var part in parts)
@@ -37,6 +51,17 @@ namespace Loader
 		{
 			if (part.Port != null) InstallLoadout(part.Port, loadout);
 			InstallLoadout(part.Parts, loadout);
+		}
+
+		public void InstallLoadout(SItemPortDef port, List<StandardisedLoadoutEntry> loadout)
+		{
+			var loadoutEntry = FindLoadoutEntry(port.Name, loadout);
+			if (String.IsNullOrEmpty(loadoutEntry?.ClassName)) return;
+
+			var item = entitySvc.GetByClassName(loadoutEntry.ClassName);
+			if (item == null) return;
+
+			port.EquippedItemUuid = item.__ref;
 		}
 
 		public void InstallLoadout(List<StandardisedItemPort> ports, List<StandardisedLoadoutEntry> loadout)
