@@ -599,7 +599,7 @@ namespace Loader
 			shipSummary.Propulsion.ManeuveringTimeTillEmpty = shipSummary.Propulsion.FuelCapacity / (shipSummary.Propulsion.FuelUsage.Main + shipSummary.Propulsion.FuelUsage.Maneuvering / 2 - shipSummary.Propulsion.FuelIntakeRate);
 
 			// Flight characteristics
-			if (shipSummary.IsSpaceship || shipSummary.IsGravlev) 
+			if (shipSummary.IsSpaceship || shipSummary.IsGravlev)
 			{
 				var (ifcs, _) = FindItemPorts(parts, x => x.InstalledItem?.Ifcs != null).FirstOrDefault();
 				var G = 9.80665f;
@@ -632,14 +632,20 @@ namespace Loader
 			}
 
 			// Drive characteristics
-			if (shipSummary.IsVehicle) 
+			if (shipSummary.IsVehicle)
 			{
 				shipSummary.DriveCharacteristics = new StandardisedDriveCharacteristics
 				{
 					TopSpeed = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.topSpeed ?? 0,
 					ReverseSpeed = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.reverseSpeed ?? 0,
 					Acceleration = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.acceleration ?? 0,
-					Decceleration = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.decceleration ?? 0
+					Decceleration = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.decceleration ?? 0,
+
+					ZeroToMax = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.topSpeed ?? 0 / vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.acceleration ?? 0,
+					ZeroToReverse = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.reverseSpeed ?? 0 / vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.acceleration ?? 0,
+
+					MaxToZero = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.topSpeed ?? 0 / vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.decceleration ?? 0,
+					ReverseToZero = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.reverseSpeed ?? 0 / vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.decceleration ?? 0,
 				};
 			}
 
