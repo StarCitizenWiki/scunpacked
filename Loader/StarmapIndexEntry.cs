@@ -15,5 +15,9 @@ namespace Loader
 		public string size;
 		public string reference;
 		public string path;
+
+		public string layer0_parent;
+		public string layer0_reference;
+		public string layer0_name;
 	}
 }
