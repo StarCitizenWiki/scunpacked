@@ -392,7 +392,7 @@ namespace Loader
 			return new StandardisedIfcs
 			{
 				MaxSpeed = ifcs.maxSpeed,
-				MaxAfterburnSpeed = ifcs.scmSpeed,
+				ScmSpeed = ifcs.scmSpeed,
 				Pitch = ifcs.maxAngularVelocity.x,
                 Yaw = ifcs.maxAngularVelocity.z,
                 Roll = ifcs.maxAngularVelocity.y,
