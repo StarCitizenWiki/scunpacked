@@ -170,7 +170,7 @@ namespace Loader
 			}
 
 			StandardisedPortSummary portSummary = parts != null ? BuildPortSummary(parts) : null;
-			StandardisedShip shipSummary = parts != null ? BuildShipSummary(entity, parts, portSummary) : null;
+			StandardisedShip shipSummary = parts != null ? BuildShipSummary(entity, parts, portSummary, vehicle) : null;
 
 			return (vehicle, entity, parts, shipSummary, portSummary);
 		}
@@ -509,7 +509,7 @@ namespace Loader
 			return portSummary;
 		}
 
-		StandardisedShip BuildShipSummary(EntityClassDefinition entity, List<StandardisedPart> parts, StandardisedPortSummary portSummary)
+		StandardisedShip BuildShipSummary(EntityClassDefinition entity, List<StandardisedPart> parts, StandardisedPortSummary portSummary, Vehicle vehicle)
 		{
 			StandardisedInventoryContainer inventorySize = null;
 			if (entity.Components.VehicleComponentParams.inventoryContainerParams.Length > 0)
@@ -599,34 +599,52 @@ namespace Loader
 			shipSummary.Propulsion.ManeuveringTimeTillEmpty = shipSummary.Propulsion.FuelCapacity / (shipSummary.Propulsion.FuelUsage.Main + shipSummary.Propulsion.FuelUsage.Maneuvering / 2 - shipSummary.Propulsion.FuelIntakeRate);
 
 			// Flight characteristics
-			var (ifcs, _) = FindItemPorts(parts, x => x.InstalledItem?.Ifcs != null).FirstOrDefault();
-			var G = 9.80665f;
-			shipSummary.FlightCharacteristics = new StandardisedFlightCharacteristics
+			if (shipSummary.IsSpaceship || shipSummary.IsGravlev) 
 			{
-				ScmSpeed = ifcs?.InstalledItem.Ifcs.MaxAfterburnSpeed ?? 0,
-				MaxSpeed = ifcs?.InstalledItem.Ifcs.MaxSpeed ?? 0,
-				Acceleration = new StandardisedThrusterSummary
+				var (ifcs, _) = FindItemPorts(parts, x => x.InstalledItem?.Ifcs != null).FirstOrDefault();
+				var G = 9.80665f;
+				shipSummary.FlightCharacteristics = new StandardisedFlightCharacteristics
 				{
-					Main = shipSummary.Propulsion.ThrustCapacity.Main / shipSummary.Mass,
-					Retro = shipSummary.Propulsion.ThrustCapacity.Retro / shipSummary.Mass,
-					Vtol = shipSummary.Propulsion.ThrustCapacity.Vtol / shipSummary.Mass,
-					Maneuvering = shipSummary.Propulsion.ThrustCapacity.Maneuvering / shipSummary.Mass
-				},
-				AccelerationG = new StandardisedThrusterSummary
+					ScmSpeed = ifcs?.InstalledItem.Ifcs.ScmSpeed ?? 0,
+					MaxSpeed = ifcs?.InstalledItem.Ifcs.MaxSpeed ?? 0,
+					Acceleration = new StandardisedThrusterSummary
+					{
+						Main = shipSummary.Propulsion.ThrustCapacity.Main / shipSummary.Mass,
+						Retro = shipSummary.Propulsion.ThrustCapacity.Retro / shipSummary.Mass,
+						Vtol = shipSummary.Propulsion.ThrustCapacity.Vtol / shipSummary.Mass,
+						Maneuvering = shipSummary.Propulsion.ThrustCapacity.Maneuvering / shipSummary.Mass
+					},
+					AccelerationG = new StandardisedThrusterSummary
+					{
+						Main = shipSummary.Propulsion.ThrustCapacity.Main / shipSummary.Mass / G,
+						Retro = shipSummary.Propulsion.ThrustCapacity.Retro / shipSummary.Mass / G,
+						Vtol = shipSummary.Propulsion.ThrustCapacity.Vtol / shipSummary.Mass / G,
+						Maneuvering = shipSummary.Propulsion.ThrustCapacity.Maneuvering / shipSummary.Mass / G
+					},
+					Pitch = ifcs?.InstalledItem.Ifcs.Pitch ?? 0,
+					Yaw = ifcs?.InstalledItem.Ifcs.Yaw ?? 0,
+					Roll = ifcs?.InstalledItem.Ifcs.Roll ?? 0
+				};
+				shipSummary.FlightCharacteristics.ZeroToScm = shipSummary.FlightCharacteristics.ScmSpeed / shipSummary.FlightCharacteristics.Acceleration.Main;
+				shipSummary.FlightCharacteristics.ZeroToMax = shipSummary.FlightCharacteristics.MaxSpeed / shipSummary.FlightCharacteristics.Acceleration.Main;
+				shipSummary.FlightCharacteristics.ScmToZero = shipSummary.FlightCharacteristics.ScmSpeed / shipSummary.FlightCharacteristics.Acceleration.Retro;
+				shipSummary.FlightCharacteristics.MaxToZero = shipSummary.FlightCharacteristics.MaxSpeed / shipSummary.FlightCharacteristics.Acceleration.Retro;
+			}
+
+			// Drive characteristics
+			if (shipSummary.IsVehicle) 
+			{
+				shipSummary.DriveCharacteristics = new StandardisedDriveCharacteristics
 				{
-					Main = shipSummary.Propulsion.ThrustCapacity.Main / shipSummary.Mass / G,
-					Retro = shipSummary.Propulsion.ThrustCapacity.Retro / shipSummary.Mass / G,
-					Vtol = shipSummary.Propulsion.ThrustCapacity.Vtol / shipSummary.Mass / G,
-					Maneuvering = shipSummary.Propulsion.ThrustCapacity.Maneuvering / shipSummary.Mass / G
-				},
-                Pitch = ifcs?.InstalledItem.Ifcs.Pitch ?? 0,
-                Yaw = ifcs?.InstalledItem.Ifcs.Yaw ?? 0,
-                Roll = ifcs?.InstalledItem.Ifcs.Roll ?? 0
-			};
-			shipSummary.FlightCharacteristics.ZeroToScm = shipSummary.FlightCharacteristics.ScmSpeed / shipSummary.FlightCharacteristics.Acceleration.Main;
-			shipSummary.FlightCharacteristics.ZeroToMax = shipSummary.FlightCharacteristics.MaxSpeed / shipSummary.FlightCharacteristics.Acceleration.Main;
-			shipSummary.FlightCharacteristics.ScmToZero = shipSummary.FlightCharacteristics.ScmSpeed / shipSummary.FlightCharacteristics.Acceleration.Retro;
-			shipSummary.FlightCharacteristics.MaxToZero = shipSummary.FlightCharacteristics.MaxSpeed / shipSummary.FlightCharacteristics.Acceleration.Retro;
+					TopSpeed = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.topSpeed ?? 0,
+					ReverseSpeed = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.reverseSpeed ?? 0,
+					Acceleration = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.acceleration ?? 0,
+					Decceleration = vehicle?.MovementParams?.ArcadeWheeled?.Handling?.Power?.decceleration ?? 0
+				};
+			}
+
+			shipSummary.Health =
+				FindParts(parts, (x) => x.MaximumDamage > 0).Sum(x => x.Item1.MaximumDamage) ?? 0;
 
 			shipSummary.Health =
 				FindParts(parts, (x) => x.MaximumDamage > 0).Sum(x => x.Item1.MaximumDamage) ?? 0;
