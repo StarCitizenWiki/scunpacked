@@ -129,7 +129,6 @@ namespace Loader
 					{
 						parts.RemoveAt(parts.Count - 1);
 						parent = String.Join(",", parts);
-						Console.WriteLine(parent);
 					} while (!nameMap.Exists(x => x.ID == parent) || nameMap.Find(x => x.ID == parent).Name ==variable.EditorName);
 				}
 				//var parent = variable.ID;
@@ -148,8 +147,7 @@ namespace Loader
 
 				//...
 				if (name == "Ariel") name = "Arial";
-				if (name == "RayariDeltanaResearch") name = "Rayari Deltana Research Outpost";
-
+				//if (name == "RayariDeltanaResearch") name = "Rayari Deltana Research Outpost";
 
 				var starmapEntry =
 					// Name Matches
@@ -160,6 +158,10 @@ namespace Loader
 					starmap.Find(entry => !String.IsNullOrEmpty(entry.name) && entry.name.Contains("-L") && entry.name.Trim().ToLower().Replace(" ", "").Contains(name.Replace("_", "").ToLower())) ??
 					// Shubin Mining SM Match
 					starmap.Find(entry => !String.IsNullOrEmpty(entry.name) && entry.name.Contains("SM0-") && entry.name.Replace(" ", "").Trim().ToLower().Contains(name.Replace("_", "-").ToLower())) ??
+					// Shubin Mining SAL- Match
+					starmap.Find(entry => !String.IsNullOrEmpty(entry.name) && entry.name.Contains("SAL-") && entry.name.Replace(" ", "").Trim().ToLower().Contains(name.Replace("_", "-").ToLower())) ??
+					// Outpost Suffix
+					starmap.Find(entry => !String.IsNullOrEmpty(entry.name) && entry.name.Trim().ToLower().Replace(" ", "").Equals(name.Replace("_", "").ToLower() + "outpost")) ??
 					// Patch Check
 				    starmap.Find(entry => !String.IsNullOrEmpty(entry.name) && entry.path.Contains(name.Replace("_", "").ToLower())) ??
 					// Patch Check 2
@@ -168,8 +170,6 @@ namespace Loader
 
 				if (starmapEntry != null && !starmapEntry.Equals(default(StarmapIndexEntry)))
 				{
-					Console.WriteLine($"Adding {name} to existing object {starmapEntry.name}");
-
 					starmapEntry.layer0_name = name;
 					starmapEntry.layer0_reference = variable.ID;//parts.Last();
 
@@ -181,39 +181,18 @@ namespace Loader
 						{
 							parts.RemoveAt(parts.Count - 1);
 							parent = String.Join(",", parts);
-							Console.WriteLine(parent);
 						} while (!nameMap.Exists(x => x.ID == parent) || nameMap.Find(x => x.ID == parent).Name ==variable.EditorName);
 					}
 
-					// if (parts.Length > 1)
-					// {
-					// 	var i = 1;
-					// 	do
-					// 	{
-					// 		++i;
-					// 		parent = parts[^i];
-					// 	} while (!nameMap.Exists(x => x.ID == parent) && nameMap.Find(x => x.ID == parent).Name !=variable.EditorName);
-					// }
-
 					starmapEntry.layer0_parent = parent;
-					//
-					// // Add Part of the parent UUID to the id in order to make it unique
-					// if (nameCount.ContainsKey(name) && nameCount[name] > 1)
-					// {
-					// 	var start = parent.Substring(0, 8);
-					// 	var end = parts.Last().Substring(8);
-					// 	starmapEntry.layer0_reference = String.Concat(start, end);
-					// }
 				}
 				else
 				{
-					Console.WriteLine($"Adding new {name} to objects");
-
 					starmap.Add(new StarmapIndexEntry
 					{
 						layer0_name = name,
 						layer0_parent = parent,
-						layer0_reference = variable.ID//parts.Last()
+						layer0_reference = variable.ID,
 					});
 				}
 			}
@@ -223,7 +202,7 @@ namespace Loader
 
 		private List<StarmapIndexEntry> FixIDs(List<StarmapIndexEntry> starmap)
 		{
-			var idMap = new List<IDTuple>();
+			var idDict = new Dictionary<string, string>();
 
 			var layer0Missing = new List<string>();
 
@@ -231,113 +210,105 @@ namespace Loader
 			{
 				if (entry.layer0_reference != null && entry.reference != null)
 				{
-					if (!idMap.Exists(datum => datum.Layer0ID == entry.layer0_reference))
-					{
-						idMap.Add(new IDTuple
-						{
-							Layer0ID = entry.layer0_reference,
-							StarmapID = entry.reference
-						});
-
-						entry.reference = entry.layer0_reference;
-					}
+					idDict[entry.layer0_reference] = entry.reference;
 				}
 
-				if (entry.layer0_reference == null)
+				if (entry.reference == null)
 				{
-					layer0Missing.Add(entry.reference);
+					layer0Missing.Add(entry.layer0_reference);
 				}
 			}
 
 			foreach (var entry in starmap)
 			{
-				if (entry.layer0_reference != null && entry.reference != null)
-				{
-					if (idMap.Exists(datum => datum.StarmapID == entry.parent))
-					{
-						var mapping = idMap.Find(datum => datum.StarmapID == entry.parent);
+				if (entry.layer0_reference == null || entry.reference != null ||
+				    !idDict.TryGetValue(entry.layer0_parent, out var value)) continue;
 
-						entry.parent = mapping.Layer0ID;
-					}
-				}
+				//entry.name = entry.layer0_name;
+				//entry.reference = entry.layer0_reference;
+				//entry.parent = value;
+				//entry.hideInStarmap = "0";
 
-				if (entry.layer0_reference != null && entry.reference == null)
-				{
-					entry.name = entry.layer0_name;
-					entry.reference = entry.layer0_reference;
-					entry.parent = entry.layer0_parent;
-					entry.hideInStarmap = "0";
+				idDict[entry.layer0_reference] = entry.reference;
 
-					// entry.layer0_name = null;
-					// entry.layer0_reference = null;
-					// entry.layer0_parent = null;
-				}
-
+				// entry.layer0_name = null;
+				// entry.layer0_reference = null;
+				// entry.layer0_parent = null;
 			}
+
 
 			foreach (var missing in layer0Missing)
 			{
-				var entry = starmap.Find(x => x.reference == missing);
+				var entry = starmap.Find(x => x.layer0_reference == missing);
 
-				if (entry == null)
+				if (entry != null && idDict.ContainsKey(entry.layer0_parent))
 				{
-					continue;
+					entry.name = entry.layer0_name;
+					entry.parent = idDict[entry.layer0_parent];
 				}
 
-				var path = entry.path.Replace(@"libs/foundry/records/starmap/pu/system/stanton/", "").Split("/");
-
-				var parent = path.First();
-
-				if (parent == "libs")
-				{
-					parent = null;
-					path = entry.path.Replace(@"libs/foundry/records/starmap/pu/", "")
-						.Replace(".xml", "")
-						.Split("_");
-
-					foreach (var part in path)
-					{
-						if (part.Contains("stanton"))
-						{
-							parent = part;
-							break;
-						}
-					}
-
-					if (parent == "libs" || String.IsNullOrEmpty(parent))
-					{
-						// This is something floating in space; Set parent to Stanton star
-						if (entry.path.Contains("starmapobject"))
-						{
-							Console.WriteLine($"Fixing {entry.name}");
-							parent = "stantonstar";
-						}
-						else
-						{
-							continue;
-						}
-
-					}
-				}
-
-				var parentEnt = starmap.FirstOrDefault(x =>
-					!String.IsNullOrEmpty(x.path) && x.path.Contains($"starmapobject.{parent}"));
-
-				if (parentEnt == null)
-				{
-					Console.WriteLine($"Could not find a candidate for {entry.name}");
-					continue;
-				}
-
-
-
-				if (parentEnt.layer0_reference == null)
-				{
-					Console.WriteLine($"Parent {parentEnt.name} as no layer0 id");
-					continue;
-				}
-
-				entry.parent = parentEnt.layer0_reference;
+				//
+				// if (entry == null)
+				// {
+				// 	continue;
+				// }
+				//
+				// var parentEntry = starmap.Find(x => x.layer0_parent == entry.layer0_parent);
+				//
+				// var path = entry.path.Replace(@"libs/foundry/records/starmap/pu/system/stanton/", "").Split("/");
+				//
+				// var parent = path.First();
+				//
+				// if (parent == "libs")
+				// {
+				// 	parent = null;
+				// 	path = entry.path.Replace(@"libs/foundry/records/starmap/pu/", "")
+				// 		.Replace(".xml", "")
+				// 		.Split("_");
+				//
+				// 	foreach (var part in path)
+				// 	{
+				// 		if (part.Contains("stanton"))
+				// 		{
+				// 			parent = part;
+				// 			break;
+				// 		}
+				// 	}
+				//
+				// 	if (parent == "libs" || String.IsNullOrEmpty(parent))
+				// 	{
+				// 		// This is something floating in space; Set parent to Stanton star
+				// 		if (entry.path.Contains("starmapobject"))
+				// 		{
+				// 			parent = "stantonstar";
+				// 		}
+				// 		else
+				// 		{
+				// 			continue;
+				// 		}
+				//
+				// 	}
+				// }
+				//
+				// var parentEnt = starmap.FirstOrDefault(x =>
+				// 	!String.IsNullOrEmpty(x.path) && x.path.Contains($"starmapobject.{parent}"));
+				//
+				// if (parentEnt == null)
+				// {
+				// 	Console.WriteLine($"Could not find a candidate for {entry.name}");
+				// 	continue;
+				// }
+				//
+				// if (parentEnt.layer0_reference == null)
+				// {
+				// 	Console.WriteLine($"Parent {parentEnt.name} as no layer0 id");
+				// 	continue;
+				// }
+				//
+				// if (idDict.TryGetValue(parentEnt.layer0_reference, out var value))
+				// {
+				// 	entry.parent = value;
+				// }
 			}
 
 			return starmap;
