@@ -33,5 +33,11 @@ namespace scdb.Xml.Entities
 
 		[XmlAttribute]
 		public bool useAlternateProjectileVisuals;
+
+		public recoilModifier recoilModifier;
+
+		public spreadModifier spreadModifier;
+
+		public aimModifier aimModifier;
 	}
 }
