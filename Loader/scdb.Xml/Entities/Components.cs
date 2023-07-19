@@ -2,6 +2,7 @@ namespace scdb.Xml.Entities
 {
 	public class Components
 	{
+		public SEntityPhysicsControllerParams SEntityPhysicsControllerParams;
 		public VehicleComponentParams VehicleComponentParams;
 		public SEntityComponentDefaultLoadoutParams SEntityComponentDefaultLoadoutParams;
 		public SAttachableComponentParams SAttachableComponentParams;
