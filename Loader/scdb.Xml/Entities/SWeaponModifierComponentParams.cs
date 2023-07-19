@@ -20,5 +20,6 @@ namespace scdb.Xml.Entities
 		public string activateOnAttach;
 
 		public modifier modifier;
+		public zeroingParams zeroingParams;
 	}
 }

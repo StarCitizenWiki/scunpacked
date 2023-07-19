@@ -11,7 +11,7 @@ namespace scdb.Xml.Entities
 		public double maxRange;
 
 		[XmlAttribute]
-		public double rangeInctreiment;
+		public double rangeIncrement;
 
 		[XmlAttribute]
 		public double autoZeroingTime;

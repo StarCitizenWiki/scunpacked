@@ -4,6 +4,6 @@ namespace scdb.Xml.Entities
 {
 	public class WeaponModifier
 	{
-		public SWeaponStats[] weaponStats;
+		public SWeaponStats weaponStats;
 	}
 }
