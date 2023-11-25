@@ -16,6 +16,10 @@ namespace scdb.Xml.Entities
 		[XmlArrayItem(typeof(SWeaponActionFireBeamParams))]
 		[XmlArrayItem(typeof(SWeaponActionFireChargedParams))]
 		[XmlArrayItem(typeof(SWeaponActionFireBurstParams))]
+		[XmlArrayItem(typeof(SWeaponActionFireHealingBeamParams))]
+		[XmlArrayItem(typeof(SWeaponActionFireSalvageRepairParams))]
+		[XmlArrayItem(typeof(SWeaponActionGatheringBeamParams))]
+		[XmlArrayItem(typeof(SWeaponActionFireTractorBeamParams))]
 		public SWeaponActionParams[] fireActions;
 		public SWeaponRegenConsumerParams[] weaponRegenConsumerParams;
 	}
@@ -121,6 +125,198 @@ namespace scdb.Xml.Entities
 		public double cooldownTime;
 
 		public weaponAction weaponAction;
+	}
+
+	public class SWeaponActionFireHealingBeamParams : SWeaponActionParams
+	{
+		[XmlAttribute]
+		public string healingMode;
+
+		[XmlAttribute]
+		public double maxDistance;
+
+		[XmlAttribute]
+		public double maxSensorDistance;
+
+		[XmlAttribute]
+		public string medicalAmmoType;
+
+		[XmlAttribute]
+		public double mSCUPerSec;
+
+		[XmlAttribute]
+		public double ammoPerMSCU;
+
+		[XmlAttribute]
+		public double wearPerSec;
+
+		[XmlAttribute]
+		public string batteryAmmoType;
+
+		[XmlAttribute]
+		public double batteryDrainPerSec;
+
+		[XmlAttribute]
+		public double autoDosageTargetBDLModifier;
+
+		[XmlAttribute]
+		public double healingBreakTime;
+
+		[XmlAttribute]
+		public double maxDoseForAutoAdjustment;
+	}
+
+
+	public class SWeaponActionFireSalvageRepairParams : SWeaponActionParams
+	{
+		[XmlAttribute]
+		public string salvageRepairMode;
+
+		[XmlAttribute]
+		public bool toggle;
+
+		[XmlAttribute]
+		public bool salvageCanFireOnFull;
+
+		[XmlAttribute]
+		public string salvageRepairAmmoType;
+
+		[XmlAttribute]
+		public string batteryAmmoType;
+
+		[XmlAttribute]
+		public double minEnergyDraw;
+
+		[XmlAttribute]
+		public double maxEnergyDraw;
+
+		[XmlAttribute]
+		public double materialEfficiency;
+
+		[XmlAttribute]
+		public double maxVehicleDamageRatio;
+
+		[XmlAttribute]
+		public double repairedMaterialRatio;
+
+		[XmlAttribute]
+		public double maxHealthRepairRate;
+
+		[XmlAttribute]
+		public double healthToAmmoRatio;
+
+		[XmlAttribute]
+		public double heatPerSecond;
+
+		[XmlAttribute]
+		public double wearPerSecond;
+
+		[XmlAttribute]
+		public double hitRadius;
+
+		[XmlAttribute]
+		public double materialGatheringGracePeriod;
+
+		[XmlAttribute]
+		public double aimPointThicknessDamageThreshold;
+
+		[XmlAttribute]
+		public double rampUpTime;
+
+		[XmlAttribute]
+		public double rampDownTime;
+
+		[XmlAttribute]
+		public double damageThreshold;
+	}
+
+
+	public class SWeaponActionGatheringBeamParams : SWeaponActionParams
+	{
+		[XmlAttribute]
+		public string inventoryType;
+
+		[XmlAttribute]
+		public double minimumDistance;
+
+		[XmlAttribute]
+		public double maximumDistance;
+
+		[XmlAttribute]
+		public double beamRadius;
+
+		[XmlAttribute]
+		public double collectionRate;
+	}
+
+
+	public class SWeaponActionFireTractorBeamParams : SWeaponActionParams
+	{
+		[XmlAttribute]
+		public bool toggle;
+
+		[XmlAttribute]
+		public double minForce;
+
+		[XmlAttribute]
+		public double maxForce;
+
+		[XmlAttribute]
+		public double additionalForceDuringZeroGHandholding;
+
+		[XmlAttribute]
+		public double minDistance;
+
+		[XmlAttribute]
+		public double maxDistance;
+
+		[XmlAttribute]
+		public double fullStrengthDistance;
+
+		[XmlAttribute]
+		public double maxAngle;
+
+		[XmlAttribute]
+		public double maxVolume;
+
+		[XmlAttribute]
+		public double volumeForceCoefficient;
+
+		[XmlAttribute]
+		public double tetherBreakTime;
+
+		[XmlAttribute]
+		public double safeRangeValueFactor;
+
+		[XmlAttribute]
+		public double maxPlayerLookRotationScale;
+
+		[XmlAttribute]
+		public bool allowScrollingIntoBreakingRange;
+
+		[XmlAttribute]
+		public bool shouldDryFireInGreenZones;
+
+		[XmlAttribute]
+		public bool shouldFireInHangars;
+
+		[XmlAttribute]
+		public bool shouldTractorSelf;
+
+		[XmlAttribute]
+		public double heatPerSecond;
+
+		[XmlAttribute]
+		public double wearPerSecond;
+
+		[XmlAttribute]
+		public string ammoType;
+
+		[XmlAttribute]
+		public double minEnergyDraw;
+
+		[XmlAttribute]
+		public double maxEnergyDraw;
 	}
 
 	public enum SWeaponActionSequenceMode
