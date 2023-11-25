@@ -27,5 +27,35 @@ namespace scdb.Xml.Entities
 
 		[XmlAttribute]
 		public double lockTime;
+
+		[XmlAttribute]
+		public double lockSignalAmplifier;
+
+		[XmlAttribute]
+		public double lockingAngle;
+
+		[XmlAttribute]
+		public double minRatioForLock;
+
+		[XmlAttribute]
+		public double lockIncreaseRate;
+
+		[XmlAttribute]
+		public double lockDecreaseRate;
+
+		[XmlAttribute]
+		public double lockRangeMin;
+
+		[XmlAttribute]
+		public double lockRangeMax;
+
+		[XmlAttribute]
+		public double lockResolutionRadius;
+
+		[XmlAttribute]
+		public double signalResilienceMin;
+
+		[XmlAttribute]
+		public double signalResilienceMax;
 	}
 }
