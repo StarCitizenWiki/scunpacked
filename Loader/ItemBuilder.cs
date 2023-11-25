@@ -495,6 +495,22 @@ namespace Loader
 					mode.PelletsPerShot = p.weaponAction.SWeaponActionFireSingleParams?.launchParams.SProjectileLauncher.pelletCount ?? p.weaponAction.SWeaponActionFireBurstParams.launchParams.SProjectileLauncher.pelletCount;
 					break;
 
+				case SWeaponActionFireHealingBeamParams p:
+					mode.FireType = p.healingMode;
+					break;
+
+				case SWeaponActionFireSalvageRepairParams p:
+					mode.FireType = p.salvageRepairMode;
+					break;
+
+				case SWeaponActionGatheringBeamParams p:
+					mode.FireType = "collectionbeam";
+					break;
+
+				case SWeaponActionFireTractorBeamParams p:
+					mode.FireType = "tractorbeam";
+					break;
+
 				case SWeaponActionSequenceParams p:
 					mode = BuildWeaponModeInfo((SWeaponActionParams)p.sequenceEntries[0].weaponAction.SWeaponActionFireSingleParams ?? (SWeaponActionParams)p.sequenceEntries[0].weaponAction.SWeaponActionFireBurstParams);
 					mode.FireType = "sequence";

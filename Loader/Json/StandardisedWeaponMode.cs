@@ -1,5 +1,6 @@
 namespace Loader
 {
+	// TODO: Add tractor / healing / gathering beam params
 	public class StandardisedWeaponMode
 	{
 		public string Name { get; set; }
