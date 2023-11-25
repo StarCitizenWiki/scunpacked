@@ -2,7 +2,7 @@ using System.Xml.Serialization;
 
 namespace scdb.Xml.Entities
 {
-	public class STargetingParams
+	public class targetingParams
 	{
 		[XmlAttribute]
 		public string trackingSignalType;

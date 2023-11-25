@@ -25,7 +25,7 @@ namespace scdb.Xml.Entities
 		[XmlAttribute]
 		public double projectileProximity;
 
-		public STargetingParams targetingParams;
+		public targetingParams targetingParams;
 		public ExplosionParams explosionParams;
 	}
 }
