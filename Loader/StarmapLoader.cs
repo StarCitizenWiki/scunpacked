@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
+using scdb.Xml.Layer0;
 
 namespace Loader
 {
@@ -35,7 +36,7 @@ namespace Loader
 		public List<StarmapIndexEntry> Load()
 		{
 			var index = new List<StarmapIndexEntry>();
-			index.AddRange(Load(@"Data\Libs\Foundry\Records\starmap\pu"));
+			index.AddRange(Load(Path.Join("Data", "Libs", "Foundry", "Records", "starmap", "pu")));
 
 			File.WriteAllText(Path.Combine(OutputFolder, "starmap.json"), JsonConvert.SerializeObject(index));
 
@@ -85,9 +86,19 @@ namespace Loader
 
 		List<StarmapIndexEntry> AddLayer0(List<StarmapIndexEntry> starmap)
 		{
-			var layer = new Layer0Parser()
-				.GetLayers(Path.Combine(DataRoot,
-					@"Data\Libs\Subsumption\Platforms\PU\System\Stanton\stantonsystem\Layer0.xml"));
+			Layer layer;
+
+			try
+			{
+				layer = new Layer0Parser()
+					.GetLayers(Path.Combine(DataRoot,
+						Path.Join("Data", "Libs", "Subsumption", "Platforms", "PU", "System", "Stanton",
+							"stantonsystem", "Layer0.xml")));
+			}
+			catch (Exception e)
+			{
+				return new List<StarmapIndexEntry>();
+			}
 
 			var variables = layer.Variables;
 
