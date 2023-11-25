@@ -22,7 +22,7 @@ namespace Loader
 		public List<ManufacturerIndexEntry> Load()
 		{
 			var index = new List<ManufacturerIndexEntry>();
-			index.AddRange(Load(@"Data\Libs\Foundry\Records\scitemmanufacturer"));
+			index.AddRange(Load(Path.Join("Data", "Libs", "Foundry", "Records", "scitemmanufacturer")));
 
 			File.WriteAllText(Path.Combine(OutputFolder, "manufacturers.json"), JsonConvert.SerializeObject(index));
 

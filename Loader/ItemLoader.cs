@@ -153,7 +153,7 @@ namespace Loader
 
 		private List<DamageResistanceMacro> LoadDamageResistanceMacros()
 		{
-			var damageResistanceMacroFolder = @"Data\Libs\Foundry\Records\damage";
+			var damageResistanceMacroFolder = Path.Join("Data", "Libs", "Foundry", "Records", "damage");
 			var damageResistanceMacros = new List<DamageResistanceMacro>();
 
 			foreach (var damageMacroFilename in Directory.EnumerateFiles(Path.Combine(DataRoot, damageResistanceMacroFolder), "*.xml", SearchOption.AllDirectories))

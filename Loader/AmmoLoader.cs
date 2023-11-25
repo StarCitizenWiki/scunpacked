@@ -17,7 +17,7 @@ namespace Loader
 		public List<AmmoParams> Load()
 		{
 			var index = new List<AmmoParams>();
-			index.AddRange(Load(@"Data\Libs\Foundry\Records\ammoparams"));
+			index.AddRange(Load(Path.Join("Data", "Libs", "Foundry", "Records", "ammoparams")));
 
 			return index;
 		}

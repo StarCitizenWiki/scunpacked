@@ -15,7 +15,7 @@ namespace Loader
 		public List<InventoryContainerIndexEntry> Load()
 		{
 			var index = new List<InventoryContainerIndexEntry>();
-			index.AddRange(Load(@"Data\Libs\Foundry\Records\inventorycontainers"));
+			index.AddRange(Load(Path.Join("Data", "Libs", "Foundry", "Records", "inventorycontainers")));
 
 			return index;
 		}
