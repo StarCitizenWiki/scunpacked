@@ -39,5 +39,7 @@ namespace scdb.Xml.Entities
 		public spreadModifier spreadModifier;
 
 		public aimModifier aimModifier;
+
+		public salvageModifier salvageModifier;
 	}
 }
