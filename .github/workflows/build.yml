@@ -1,0 +1,113 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Tag the repository
+        id: tag
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "foxftw@star-citizen.wiki"
+          # See https://docs.github.com/en/get-started/using-git/dealing-with-special-characters-in-branch-and-tag-names
+          TAG=$(echo ${GITHUB_SHA} | cut -c1-8)
+          echo "$TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          git tag -a $TAG -m "Automated build on push: $TAG" ${GITHUB_SHA}
+          git push origin $TAG
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Loader
+
+      - name: Build
+        run: dotnet build --configuration Release Loader
+
+      - name: Publish Release
+        run: |
+          dotnet publish -c Release -o publish Loader
+          mkdir -p release
+          cp -r publish/* release/
+        shell: bash
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: linux-build
+          path: release/*
+          if-no-files-found: error
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Loader
+
+      - name: Build
+        run: dotnet build --configuration Release Loader
+
+      - name: Publish Release
+        run: |
+          dotnet publish -c Release -o publish Loader
+          mkdir -p release
+          cp -r publish/* release/
+        shell: bash
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: release/*
+          if-no-files-found: error
+
+  release:
+    needs: [ build, build-windows ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v3
+        id: download-linux
+        with:
+          name: linux-build
+          path: linux-release
+      - uses: actions/download-artifact@v3
+        id: download-windows
+        with:
+          name: windows-build
+          path: windows-release
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            linux-release/*
+            windows-release/*
+          tag_name: ${{ needs.build.outputs.tag }}
+          draft: false
+          prerelease: true
+          body: "Automated build on push"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
