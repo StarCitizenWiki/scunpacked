@@ -29,6 +29,7 @@ namespace scdb.Xml.Entities
 		public SCItemTurretParams SCItemTurretParams;
 		public SCItemEMPParams SCItemEMPParams;
 		public SCItemMissileParams SCItemMissileParams;
+		public SCItemMissileParams SCItemBombParams;
 		public SEntityComponentMiningLaserParams SEntityComponentMiningLaserParams;
 		public CommodityComponentParams CommodityComponentParams;
 		public SEntityInteractableParams SEntityInteractableParams;

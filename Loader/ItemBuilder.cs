@@ -66,6 +66,7 @@ namespace Loader
 			stdItem.Weapon = BuildWeaponInfo(entity);
 			stdItem.Ammunition = BuildAmmunitionInfo(entity);
 			stdItem.Missile = BuildMissileInfo(entity);
+			stdItem.Bomb = BuildBombInfo(entity);
 			stdItem.Scanner = BuildScannerInfo(entity);
 			stdItem.Radar = BuildRadarInfo(entity);
 			stdItem.Ping = BuildPingInfo(entity);
@@ -546,7 +547,7 @@ namespace Loader
 				Size = ammo.size,
 				ImpactDamage = ConvertDamage(impactDamage),
 				DetonationDamage = ConvertDamage(detonationDamage),
-				Capacity = item.Components.SAmmoContainerComponentParams?.maxAmmoCount
+				Capacity = item.Components.SAmmoContainerComponentParams?.maxAmmoCount ?? item.Components.SAmmoContainerComponentParams?.maxRestockCount
 			};
 		}
 
@@ -613,6 +614,19 @@ namespace Loader
 		StandardisedMissile BuildMissileInfo(EntityClassDefinition item)
 		{
 			var missile = item.Components.SCItemMissileParams;
+			if (missile == null) return null;
+
+			var info = new StandardisedMissile
+			{
+				Damage = ConvertDamage(missile.explosionParams.damage[0])
+			};
+
+			return info;
+		}
+
+		StandardisedMissile BuildBombInfo(EntityClassDefinition item)
+		{
+			var missile = item.Components.SCItemBombParams;
 			if (missile == null) return null;
 
 			var info = new StandardisedMissile
