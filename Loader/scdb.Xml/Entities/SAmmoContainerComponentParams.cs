@@ -11,6 +11,9 @@ namespace scdb.Xml.Entities
 		public double maxAmmoCount;
 
 		[XmlAttribute]
+		public double maxRestockCount;
+
+		[XmlAttribute]
 		public string ammoParamsRecord;
 	}
 }
