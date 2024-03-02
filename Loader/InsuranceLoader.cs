@@ -16,7 +16,7 @@ namespace Loader
 		{
 			var output = new Dictionary<string, StandardisedInsurance>();
 
-			var insurance = Parse<ShipInsuranceRecord>(Path.Combine(DataRoot, @"data\libs\foundry\records\shipinsurancerecord\shipinsurancepolicy_default.xml"));
+			var insurance = Parse<ShipInsuranceRecord>(Path.Combine(DataRoot, Path.Join("Data", "Libs", "Foundry", "Records", "shipinsurancerecord", "shipinsurancepolicy_default.xml")));
 			foreach (var record in insurance.allShips)
 			{
 				if (output.ContainsKey(record.shipEntityClassName)) continue; // Fix for Redeemer appearing twice

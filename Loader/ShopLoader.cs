@@ -39,16 +39,17 @@ namespace Loader
 		{
 			var shops = new List<Shop>();
 
-			var productListPath = Path.Combine(DataRoot, @"Data\Libs\Subsumption\Shops\RetailProductPrices.xml");
 
-			if (!File.Exists(productListPath)) 
+			var productListPath = Path.Combine(DataRoot, Path.Join("Data", "Libs", "Subsumption", "Shops", "RetailProductPrices.xml"));
+
+			if (!File.Exists(productListPath))
 			{
 				return shops;
 			}
-			
+
 			var productList = Parse<Node>(productListPath);
-			var shopRootNode = Parse<ShopLayoutNode>(Path.Combine(DataRoot, @"Data\Libs\Subsumption\Shops\ShopLayouts.xml"));
-			var rentalTemplatesFolder = @"Data\Libs\Subsumption\Shops\Templates";
+			var shopRootNode = Parse<ShopLayoutNode>(Path.Combine(DataRoot, Path.Join("Data", "Libs", "Subsumption", "Shops", "ShopLayouts.xml")));
+			var rentalTemplatesFolder = Path.Join("Data", "Libs", "Subsumption", "Shops", "Templates");
 
 			this.rentalTemplates = new List<RentalTemplate>();
 

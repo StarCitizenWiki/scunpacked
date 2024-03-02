@@ -17,7 +17,7 @@ namespace Loader
 
 			try
 			{
-				using (var ini = new StreamReader(Path.Combine(DataRoot, $@"Data\Localization\{language}\global.ini")))
+				using (var ini = new StreamReader(Path.Combine(DataRoot, Path.Join("Data", "Localization", language, "global.ini"))))
 				{
 					for (var line = ini.ReadLine(); line != null; line = ini.ReadLine())
 					{
