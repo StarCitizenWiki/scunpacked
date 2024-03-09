@@ -14,6 +14,12 @@ namespace scdb.Xml.Entities
 		public double damageMultiplier;
 
 		[XmlAttribute]
+		public double damageOverTimeMultiplier;
+
+		[XmlAttribute]
+		public double projectileSpeedMultiplier;
+
+		[XmlAttribute]
 		public double pellets;
 
 		[XmlAttribute]
@@ -30,6 +36,9 @@ namespace scdb.Xml.Entities
 
 		[XmlAttribute]
 		public double soundRadiusMultiplier;
+
+		[XmlAttribute]
+		public double chargeTimeMultiplier;
 
 		[XmlAttribute]
 		public bool useAlternateProjectileVisuals;
