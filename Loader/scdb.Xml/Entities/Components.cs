@@ -48,5 +48,7 @@ namespace scdb.Xml.Entities
 		public SCItemExplosiveParams SCItemExplosiveParams;
 		public EntityComponentAttachableModifierParams EntityComponentAttachableModifierParams;
 		public SWeaponModifierComponentParams SWeaponModifierComponentParams;
+		public HackingChipParams HackingChipParams;
+		public RemovableChipParams RemovableChipParams;
 	}
 }
