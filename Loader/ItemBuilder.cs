@@ -547,7 +547,26 @@ namespace Loader
 				Size = ammo.size,
 				ImpactDamage = ConvertDamage(impactDamage),
 				DetonationDamage = ConvertDamage(detonationDamage),
-				Capacity = item.Components.SAmmoContainerComponentParams?.maxAmmoCount ?? item.Components.SAmmoContainerComponentParams?.maxRestockCount
+				Capacity = item.Components.SAmmoContainerComponentParams?.maxAmmoCount ?? item.Components.SAmmoContainerComponentParams?.maxRestockCount,
+				BulletImpulseFalloff = new StandardisedBulletImpulseFalloff{
+					MinDistance = projectiles?.impulseFalloffParams?.BulletImpulseFalloffParams?.minDistance,
+					DropFalloff = projectiles?.impulseFalloffParams?.BulletImpulseFalloffParams?.dropFalloff,
+					MaxFalloff = projectiles?.impulseFalloffParams?.BulletImpulseFalloffParams?.maxFalloff,
+				},
+				BulletPierceability = new StandardisedBulletPierceability{
+					DamageFalloffLevel1 = projectiles?.pierceabilityParams?.damageFalloffLevel1,
+					DamageFalloffLevel2 = projectiles?.pierceabilityParams?.damageFalloffLevel2,
+					DamageFalloffLevel3 = projectiles?.pierceabilityParams?.damageFalloffLevel3,
+					MaxPenetrationThickness = projectiles?.pierceabilityParams?.maxPenetrationThickness,
+				},
+				BulletElectron = new StandardisedBulletElectron{
+					JumpRange = projectiles?.electronParams?.BulletElectronParams?.jumpRange,
+					MaximumJumps = projectiles?.electronParams?.BulletElectronParams?.maximumJumps,
+					ResidualChargeMultiplier = projectiles?.electronParams?.BulletElectronParams?.residualChargeMultiplier,
+				},
+				DamageDropMinDistance = ConvertDamage(Damage.FromDamageInfo(projectiles?.damageDropParams?.BulletDamageDropParams?.damageDropMinDistance?.DamageInfo ?? new DamageInfo())),
+				DamageDropPerMeter = ConvertDamage(Damage.FromDamageInfo(projectiles?.damageDropParams?.BulletDamageDropParams?.damageDropPerMeter?.DamageInfo ?? new DamageInfo())),
+				DamageDropMinDamage = ConvertDamage(Damage.FromDamageInfo(projectiles?.damageDropParams?.BulletDamageDropParams?.damageDropMinDamage?.DamageInfo ?? new DamageInfo())),
 			};
 		}
 

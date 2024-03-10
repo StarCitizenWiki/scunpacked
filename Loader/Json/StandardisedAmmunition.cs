@@ -8,5 +8,12 @@ namespace Loader
 		public double? Capacity { get; set; }
 		public StandardisedDamage ImpactDamage { get; set; }
 		public StandardisedDamage DetonationDamage { get; set; }
+		public StandardisedBulletImpulseFalloff BulletImpulseFalloff { get; set; }
+		public StandardisedBulletPierceability BulletPierceability { get; set; }
+		public StandardisedBulletElectron BulletElectron { get; set; }
+
+		public StandardisedDamage DamageDropMinDistance { get; set; }
+		public StandardisedDamage DamageDropPerMeter { get; set; }
+		public StandardisedDamage DamageDropMinDamage { get; set; }
 	}
 }
