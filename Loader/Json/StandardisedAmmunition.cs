@@ -2,6 +2,8 @@ namespace Loader
 {
 	public class StandardisedAmmunition
 	{
+		public string UUID { get; set; }
+		public string Type { get; set; }
 		public double Speed { get; set; }
 		public double Range { get; set; }
 		public double Size { get; set; }

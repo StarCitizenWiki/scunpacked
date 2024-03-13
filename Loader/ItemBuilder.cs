@@ -542,6 +542,8 @@ namespace Loader
 
 			return new StandardisedAmmunition
 			{
+				UUID = ammo.__ref,
+				Type = ammo.__type,
 				Speed = ammo.speed,
 				Range = ammo.lifetime * ammo.speed,
 				Size = ammo.size,
