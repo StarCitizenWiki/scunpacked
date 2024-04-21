@@ -50,5 +50,6 @@ namespace scdb.Xml.Entities
 		public SWeaponModifierComponentParams SWeaponModifierComponentParams;
 		public HackingChipParams HackingChipParams;
 		public RemovableChipParams RemovableChipParams;
+		public SMeleeWeaponComponentParams SMeleeWeaponComponentParams;
 	}
 }

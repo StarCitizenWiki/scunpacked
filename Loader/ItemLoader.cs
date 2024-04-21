@@ -22,6 +22,7 @@ namespace Loader
 		ItemInstaller itemInstaller;
 		LoadoutLoader loadoutLoader;
 		InventoryContainerService _inventoryContainerSvc;
+		MeleeCombatService meleeConfigSvc;
 
 		// Don't dump items with these types
 		string[] type_avoids =
@@ -46,16 +47,17 @@ namespace Loader
 			"removablechip",
 		};
 
-		public ItemLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, EntityService entitySvc, AmmoService ammoSvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, InventoryContainerService inventoryContainerSvc)
+		public ItemLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, EntityService entitySvc, AmmoService ammoSvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, InventoryContainerService inventoryContainerSvc, MeleeCombatService meleeConfigSvc)
 		{
 			this.itemBuilder = itemBuilder;
 			this.manufacturerSvc = manufacturerSvc;
-			this.itemClassifier = new ItemClassifier();
+			itemClassifier = new ItemClassifier();
 			this.entitySvc = entitySvc;
 			this.ammoSvc = ammoSvc;
 			this.itemInstaller = itemInstaller;
 			this.loadoutLoader = loadoutLoader;
-			this._inventoryContainerSvc = inventoryContainerSvc;
+			this.meleeConfigSvc = meleeConfigSvc;
+			_inventoryContainerSvc = inventoryContainerSvc;
 		}
 
 		public List<ItemIndexEntry> Load(string typeFilter = null)
@@ -88,6 +90,13 @@ namespace Loader
 				if (!String.IsNullOrEmpty(ammoRef))
 				{
 					ammoEntry = ammoSvc.GetByReference(ammoRef);
+				}
+
+				MeleeCombatConfig combatConfig = null;
+				var combatRef = entity?.Components?.SMeleeWeaponComponentParams?.meleeCombatConfig;
+				if (!String.IsNullOrEmpty(combatRef))
+				{
+					combatConfig = meleeConfigSvc.GetByReference(combatRef);
 				}
 
 				DamageResistance damageResistances = null;
@@ -126,6 +135,7 @@ namespace Loader
 					},
 					damageResistances,
 					inventoryContainer,
+					combatConfig,
 				});
 				File.WriteAllText(jsonFilename, json);
 			}
