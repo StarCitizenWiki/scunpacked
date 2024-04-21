@@ -93,6 +93,17 @@ namespace Loader
 			var manufacturerIndex = manufacturerLoader.Load();
 			var manufacturerSvc = new ManufacturerService(manufacturerIndex);
 
+			// Loot
+			Console.WriteLine("Load Loot Archetypes");
+			var lootLoader = new LootLoader
+			{
+				OutputFolder = outputRoot,
+				DataRoot = scDataRoot
+			};
+			var lootArchetypes = lootLoader.LoadArchetypes();
+			var lootTables = lootLoader.LoadTables();
+			var lootSvc = new LootService(lootArchetypes, lootTables);
+
 			// Ammunition
 			Console.WriteLine("Load Ammunition");
 			var ammoLoader = new AmmoLoader
@@ -127,12 +138,17 @@ namespace Loader
 			var loadoutLoader = new LoadoutLoader(xmlLoadoutLoader, manualLoadoutLoader);
 			var itemBuilder = new ItemBuilder(localisationSvc, manufacturerSvc, ammoSvc, entitySvc, inventorySvc);
 			var itemInstaller = new ItemInstaller(entitySvc, loadoutLoader, itemBuilder);
+			var meleeLoader = new MeleeCombatLoader{
+				OutputFolder = outputRoot,
+				DataRoot = scDataRoot
+			};;
+			var meleeConfigSvc = new MeleeCombatService(meleeLoader.Load());
 
 			// Items
 			if (doItems)
 			{
 				Console.WriteLine("Load Items");
-				var itemLoader = new ItemLoader(itemBuilder, manufacturerSvc, entitySvc, ammoSvc, itemInstaller, loadoutLoader, inventorySvc)
+				var itemLoader = new ItemLoader(itemBuilder, manufacturerSvc, entitySvc, ammoSvc, itemInstaller, loadoutLoader, inventorySvc, meleeConfigSvc)
 				{
 					OutputFolder = outputRoot,
 					DataRoot = scDataRoot,
