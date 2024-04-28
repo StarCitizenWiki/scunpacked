@@ -19,6 +19,7 @@ namespace Loader
 			bool doItems = true;
 			bool doShops = true;
 			bool doStarmap = true;
+			bool doMissions = true;
 			bool noCache = false;
 			string typeFilter = null;
 			string shipFilter = null;
@@ -32,6 +33,7 @@ namespace Loader
 				{ "noitems", v => doItems = false },
 				{ "noshops", v => doShops = false },
 				{ "nomap", v => doStarmap = false },
+				{ "nomissions", v => doMissions = false },
 				{ "nocache", v => noCache = true },
 				{ "types=", v => typeFilter = v },
 				{ "ships=", v=> shipFilter = v }
@@ -104,6 +106,15 @@ namespace Loader
 			var lootTables = lootLoader.LoadTables();
 			var lootSvc = new LootService(lootArchetypes, lootTables);
 
+			// Factions
+			Console.WriteLine("Load Factions");
+			var factionLoader = new FactionLoader
+			{
+				OutputFolder = outputRoot,
+				DataRoot = scDataRoot
+			};
+			var factions = factionLoader.LoadFactions();
+
 			// Ammunition
 			Console.WriteLine("Load Ammunition");
 			var ammoLoader = new AmmoLoader
@@ -123,6 +134,30 @@ namespace Loader
 			// //var insurancePrices = insuranceLoader.Load();
 			// //var insuranceSvc = new InsuranceService(insurancePrices);
 			// var insuranceSvc = new InsuranceService(null);
+
+
+			// Missions
+			if (doMissions)
+			{
+				Console.WriteLine("Load Missions");
+				var missionLoader = new MissionLoader
+				{
+					OutputFolder = outputRoot,
+					DataRoot = scDataRoot,
+					locService = localisationSvc
+				};
+				var missions = missionLoader.LoadMissions();
+
+				var rewardsLoader = new RewardLoader
+				{
+					OutputFolder = outputRoot,
+					DataRoot = scDataRoot,
+					locService = localisationSvc
+				};
+				rewardsLoader.LoadRewards();
+				rewardsLoader.LoadStandings();
+				rewardsLoader.LoadScopes();
+			}
 
 			// PersonalInventories
 			Console.WriteLine("Load PersonalInventories");

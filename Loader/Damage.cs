@@ -1,3 +1,5 @@
+using scdb.Xml.Entities;
+
 namespace Loader
 {
 	public class Damage
@@ -9,7 +11,7 @@ namespace Loader
 		public double biochemical;
 		public double stun;
 
-		public static Damage FromDamageInfo(scdb.Xml.Entities.DamageInfo info)
+		public static Damage FromDamageInfo(DamageInfo info)
 		{
 			if (info == null) return null;
 
