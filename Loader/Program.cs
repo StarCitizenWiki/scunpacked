@@ -111,7 +111,8 @@ namespace Loader
 			var factionLoader = new FactionLoader
 			{
 				OutputFolder = outputRoot,
-				DataRoot = scDataRoot
+				DataRoot = scDataRoot,
+				locService = localisationSvc
 			};
 			var factions = factionLoader.LoadFactions();
 
@@ -147,6 +148,8 @@ namespace Loader
 					locService = localisationSvc
 				};
 				var missions = missionLoader.LoadMissions();
+				missionLoader.LoadMissionTypes();
+				missionLoader.LoadMissionGiver();
 
 				var rewardsLoader = new RewardLoader
 				{

@@ -60,6 +60,7 @@ namespace scdb.Xml.Missionbroker
 		public Reference[] associatedMissions;
 		public MissionReward missionReward;
 		public SReputationAmountListParams[] missionResultReputationRewards;
+		public MissionDeadline missionDeadline;
 		public CompletionTags completionTags;
 		public Modifiers modifiers;
 		public Reference[] missionTags;

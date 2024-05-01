@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
+using Loader.scdb.Xml.Missiongiver;
+using Loader.scdb.Xml.Missiontype;
 using Newtonsoft.Json;
-using scdb.Xml.Entities;
 using scdb.Xml.Missionbroker;
 
 namespace Loader
@@ -19,13 +18,13 @@ namespace Loader
 			Directory.CreateDirectory(Path.Combine(OutputFolder, "missions"));
 
 			var output = new Dictionary<string, MissionBrokerEntry>();
-
+			var parser = new ClassParser<MissionBrokerEntry>();
 
 			var path = Path.Combine(DataRoot, Path.Join("Data", "Libs", "Foundry", "Records", "missionbroker"));
 
 			foreach (var entityFilename in Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories))
 			{
-				var mission = Parse<MissionBrokerEntry>(entityFilename);
+				var mission = parser.Parse(entityFilename);
 				AddTranslations(mission);
 				output.Add(mission.__ref, mission);
 				File.WriteAllText(Path.Combine(OutputFolder, "missions", $"{mission.ClassName.ToLower()}.json"), JsonConvert.SerializeObject(mission));
@@ -34,29 +33,58 @@ namespace Loader
 			return output;
 		}
 
-		T Parse<T>(string xmlFilename) where T : ClassBase
+		public Dictionary<string, MissionType> LoadMissionTypes()
 		{
-			string rootNodeName;
-			using (var reader = XmlReader.Create(new StreamReader(xmlFilename)))
+			Directory.CreateDirectory(Path.Combine(OutputFolder, "missions", "types"));
+
+			var output = new Dictionary<string, MissionType>();
+
+			var path = Path.Combine(DataRoot, Path.Join("Data", "Libs", "Foundry", "Records", "missiontype"));
+
+			var parser = new ClassParser<MissionType>();
+
+			foreach (var entityFilename in Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories))
 			{
-				reader.MoveToContent();
-				rootNodeName = reader.Name;
+				var missionType = parser.Parse(entityFilename);
+				AddTypeTranslations(missionType);
+				output.Add(missionType.__ref, missionType);
+				File.WriteAllText(Path.Combine(OutputFolder, "missions", "types", $"{missionType.ClassName.ToLower()}.json"), JsonConvert.SerializeObject(missionType));
 			}
 
-			var split = rootNodeName.Split('.');
-			string className = split[split.Length - 1];
+			return output;
+		}
 
-			var xml = File.ReadAllText(xmlFilename);
-			var doc = new XmlDocument();
-			doc.LoadXml(xml);
+		public Dictionary<string, MissionGiver> LoadMissionGiver()
+		{
+			Directory.CreateDirectory(Path.Combine(OutputFolder, "missions", "missiongiver"));
 
-			var serialiser = new XmlSerializer(typeof(T), new XmlRootAttribute { ElementName = rootNodeName });
-			using (var stream = new XmlNodeReader(doc))
+			var output = new Dictionary<string, MissionGiver>();
+
+			var path = Path.Combine(DataRoot, Path.Join("Data", "Libs", "Foundry", "Records", "missiongiver"));
+
+			var parser = new ClassParser<MissionGiver>();
+
+			foreach (var entityFilename in Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories))
 			{
-				var entity = (T)serialiser.Deserialize(stream);
-				entity.ClassName = className;
-				return entity;
+				var giver = parser.Parse(entityFilename);
+				AddGiverTranslations(giver);
+				output.Add(giver.__ref, giver);
+				File.WriteAllText(Path.Combine(OutputFolder, "missions", "missiongiver", $"{giver.ClassName.ToLower()}.json"), JsonConvert.SerializeObject(giver));
 			}
+
+			return output;
+		}
+
+		private void AddTypeTranslations(MissionType entity)
+		{
+			entity.LocalisedTypeName = locService.GetText(entity.LocalisedTypeName, entity.LocalisedTypeName);
+		}
+
+		private void AddGiverTranslations(MissionGiver entity)
+		{
+			entity.description = locService.GetText(entity.description, entity.description);
+			entity.headquarters = locService.GetText(entity.headquarters, entity.headquarters);
+			entity.displayName = locService.GetText(entity.displayName, entity.displayName);
 		}
 
 		private void AddTranslations(MissionBrokerEntry entity)
