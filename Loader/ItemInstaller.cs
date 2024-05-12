@@ -83,6 +83,7 @@ namespace Loader
 			if (item == null) return;
 
 			var standardisedItem = itemBuilder.BuildItem(item);
+
 			port.InstalledItem = standardisedItem;
 
 			// Update the loadout with anything this item brings with it

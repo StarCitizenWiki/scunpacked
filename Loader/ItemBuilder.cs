@@ -25,6 +25,8 @@ namespace Loader
 
 		public StandardisedItem BuildItem(EntityClassDefinition entity)
 		{
+			if (entity == null) return null;
+
 			var volume =
 				ConvertToSCU(entity.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyVolume) ?? 0;
 
@@ -32,16 +34,16 @@ namespace Loader
 			{
 				UUID = entity.__ref,
 				ClassName = entity.ClassName,
-				Size = entity.Components.SAttachableComponentParams?.AttachDef.Size ?? 0,
-				Grade = entity.Components.SAttachableComponentParams?.AttachDef.Grade ?? 0,
+				Size = entity.Components?.SAttachableComponentParams?.AttachDef?.Size ?? 0,
+				Grade = entity.Components?.SAttachableComponentParams?.AttachDef?.Grade ?? 0,
 				Width = entity.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyDimensions?.x ?? 0,
 				Length = entity.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyDimensions?.y ?? 0,
 				Height = entity.Components?.SAttachableComponentParams?.AttachDef?.inventoryOccupancyDimensions?.z ?? 0,
 				Volume = volume,
-				Type = BuildTypeName(entity.Components.SAttachableComponentParams?.AttachDef.Type, entity.Components.SAttachableComponentParams?.AttachDef.SubType),
-				Name = localisationSvc.GetText(entity.Components.SAttachableComponentParams?.AttachDef.Localization.Name, entity.ClassName),
-				Description = localisationSvc.GetText(entity.Components.SAttachableComponentParams?.AttachDef.Localization.Description),
-				Manufacturer = manufacturerSvc.GetManufacturer(entity.Components.SAttachableComponentParams?.AttachDef.Manufacturer, entity.ClassName),
+				Type = BuildTypeName(entity.Components?.SAttachableComponentParams?.AttachDef?.Type, entity.Components?.SAttachableComponentParams?.AttachDef?.SubType),
+				Name = localisationSvc.GetText(entity.Components?.SAttachableComponentParams?.AttachDef?.Localization?.Name, entity.ClassName),
+				Description = localisationSvc.GetText(entity.Components?.SAttachableComponentParams?.AttachDef?.Localization?.Description),
+				Manufacturer = manufacturerSvc.GetManufacturer(entity.Components?.SAttachableComponentParams?.AttachDef?.Manufacturer, entity.ClassName),
 				Ports = BuildPortList(entity),
 				Tags = BuildTagList(entity)
 			};
@@ -105,7 +107,7 @@ namespace Loader
 		{
 			var ports = new List<StandardisedItemPort>();
 
-			if (entity.Components.SItemPortContainerComponentParams == null) return ports;
+			if (entity?.Components?.SItemPortContainerComponentParams == null) return ports;
 
 			foreach (var port in entity.Components.SItemPortContainerComponentParams.Ports)
 			{
