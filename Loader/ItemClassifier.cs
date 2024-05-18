@@ -99,7 +99,7 @@ namespace Loader
 			{
 				if (!match.Matcher(entity)) continue;
 
-				var classification = match.Classifier(entity.Components?.SAttachableComponentParams?.AttachDef.Type, entity.Components?.SAttachableComponentParams.AttachDef.SubType);
+				var classification = match.Classifier(entity.Components?.SAttachableComponentParams?.AttachDef.Type, entity.Components?.SAttachableComponentParams?.AttachDef?.SubType);
 				if (classification?.EndsWith(".UNDEFINED") ?? false) classification = classification.Substring(0, classification.Length - 10);
 
 				return classification;

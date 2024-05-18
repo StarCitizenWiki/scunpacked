@@ -6,9 +6,9 @@ namespace scdb.Xml.Vehicles
 	public class AngleRange
 	{
 		[XmlAttribute]
-		public int min;
+		public string min;
 
 		[XmlAttribute]
-		public int max;
+		public string max;
 	}
 }

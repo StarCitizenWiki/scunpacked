@@ -92,7 +92,9 @@ namespace Loader
 		{
 			var tags = new List<string>();
 
-			var tagString = entity.Components.SAttachableComponentParams?.AttachDef.Tags;
+			if (entity?.Components?.SAttachableComponentParams?.AttachDef?.Tags == null) return tags;
+
+			var tagString = entity.Components?.SAttachableComponentParams?.AttachDef?.Tags;
 			if (tagString != null)
 			{
 				foreach (var tag in tagString.Split(" "))

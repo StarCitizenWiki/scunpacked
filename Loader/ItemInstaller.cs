@@ -28,7 +28,7 @@ namespace Loader
 
 		public void InstallLoadout(EntityClassDefinition item, List<StandardisedLoadoutEntry> loadout)
 		{
-			if (item?.Components?.SItemPortContainerComponentParams?.Ports == null)
+			if (item == null || item?.Components?.SItemPortContainerComponentParams?.Ports == null)
 			{
 				return;
 			}
