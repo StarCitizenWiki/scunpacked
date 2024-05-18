@@ -186,15 +186,15 @@ namespace Loader
 			bool isGroundVehicle = entity.Components?.VehicleComponentParams.vehicleCareer == "@vehicle_focus_ground";
 			bool isGravlevVehicle = entity.Components?.VehicleComponentParams.isGravlevVehicle ?? false;
 			bool isSpaceship = !(isGroundVehicle || isGravlevVehicle);
-			var manufacturer = manufacturerSvc.GetManufacturer(entity.Components.VehicleComponentParams.manufacturer, entity.ClassName);
+			var manufacturer = manufacturerSvc.GetManufacturer(entity.Components?.VehicleComponentParams.manufacturer, entity.ClassName);
 
 			var indexEntry = new ShipIndexEntry
 			{
 				className = entity.ClassName,
-				name = entity.Components.VehicleComponentParams.vehicleName,
-				career = entity.Components.VehicleComponentParams.vehicleCareer,
-				role = entity.Components.VehicleComponentParams.vehicleRole,
-				dogFightEnabled = Convert.ToBoolean(entity.Components.VehicleComponentParams.dogfightEnabled),
+				name = entity.Components?.VehicleComponentParams.vehicleName,
+				career = entity.Components?.VehicleComponentParams.vehicleCareer,
+				role = entity.Components?.VehicleComponentParams.vehicleRole,
+				dogFightEnabled = Convert.ToBoolean(entity.Components?.VehicleComponentParams.dogfightEnabled),
 				size = shipSummary?.Size,
 				isGroundVehicle = isGroundVehicle,
 				isGravlevVehicle = isGravlevVehicle,
@@ -512,25 +512,25 @@ namespace Loader
 		StandardisedShip BuildShipSummary(EntityClassDefinition entity, List<StandardisedPart> parts, StandardisedPortSummary portSummary, Vehicle vehicle)
 		{
 			StandardisedInventoryContainer inventorySize = null;
-			if (entity.Components.VehicleComponentParams.inventoryContainerParams.Length > 0)
+			if (entity.Components?.VehicleComponentParams.inventoryContainerParams.Length > 0)
 			{
-				inventorySize = inventoryContainerSvc.GetInventoryContainer(entity.Components.VehicleComponentParams
+				inventorySize = inventoryContainerSvc.GetInventoryContainer(entity.Components?.VehicleComponentParams
 					.inventoryContainerParams);
 			}
 
 			var shipSummary = new StandardisedShip
 			{
 				ClassName = entity.ClassName,
-				Name = localisationSvc.GetText(entity.Components.VehicleComponentParams.vehicleName, entity.ClassName),
-				Description = localisationSvc.GetText(entity.Components.VehicleComponentParams.vehicleDescription),
-				Career = localisationSvc.GetText(entity.Components.VehicleComponentParams.vehicleCareer),
-				Role = localisationSvc.GetText(entity.Components.VehicleComponentParams.vehicleRole),
-				Manufacturer = manufacturerSvc.GetManufacturer(entity.Components.VehicleComponentParams.manufacturer, entity.ClassName),
-				Size = entity.Components.SAttachableComponentParams.AttachDef.Size,
-				Width = entity.Components.VehicleComponentParams.maxBoundingBoxSize.x,
-				Length = entity.Components.VehicleComponentParams.maxBoundingBoxSize.y,
-				Height = entity.Components.VehicleComponentParams.maxBoundingBoxSize.z,
-				Crew = entity.Components.VehicleComponentParams.crewSize,
+				Name = localisationSvc.GetText(entity.Components?.VehicleComponentParams.vehicleName, entity.ClassName),
+				Description = localisationSvc.GetText(entity.Components?.VehicleComponentParams.vehicleDescription),
+				Career = localisationSvc.GetText(entity.Components?.VehicleComponentParams.vehicleCareer),
+				Role = localisationSvc.GetText(entity.Components?.VehicleComponentParams.vehicleRole),
+				Manufacturer = manufacturerSvc.GetManufacturer(entity.Components?.VehicleComponentParams.manufacturer, entity.ClassName),
+				Size = entity.Components?.SAttachableComponentParams?.AttachDef?.Size ?? 0,
+				Width = entity.Components?.VehicleComponentParams?.maxBoundingBoxSize?.x ?? 0,
+				Length = entity.Components?.VehicleComponentParams?.maxBoundingBoxSize?.y ?? 0,
+				Height = entity.Components?.VehicleComponentParams?.maxBoundingBoxSize?.z ?? 0,
+				Crew = entity.Components?.VehicleComponentParams?.crewSize ?? 0,
 				WeaponCrew = portSummary.MannedTurrets.Count + portSummary.RemoteTurrets.Count,
 				OperationsCrew = Math.Max(portSummary.MiningTurrets.Count, portSummary.UtilityTurrets.Count),
 				Mass = FindParts(parts, x => true).Sum((x) => x.Item1.Mass ?? 0),

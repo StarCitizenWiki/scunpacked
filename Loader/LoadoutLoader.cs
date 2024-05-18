@@ -19,7 +19,7 @@ namespace Loader
 		{
 			var loadout = new List<StandardisedLoadoutEntry>();
 
-			var loadoutParams = entity.Components.SEntityComponentDefaultLoadoutParams?.loadout;
+			var loadoutParams = entity.Components?.SEntityComponentDefaultLoadoutParams?.loadout;
 
 			if (loadoutParams?.SItemPortLoadoutManualParams != null) loadout.AddRange(LoadManualLoadout(loadoutParams.SItemPortLoadoutManualParams));
 			if (loadoutParams?.SItemPortLoadoutXMLParams != null) loadout.AddRange(LoadXmlLoadout(loadoutParams.SItemPortLoadoutXMLParams));
