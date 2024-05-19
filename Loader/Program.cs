@@ -15,12 +15,13 @@ namespace Loader
 		{
 			string scDataRoot = null;
 			string outputRoot = null;
-			bool doShips = true;
-			bool doItems = true;
-			bool doShops = true;
-			bool doStarmap = true;
-			bool doMissions = true;
-			bool noCache = false;
+			var doShips = true;
+			var doItems = true;
+			var doShops = true;
+			var doStarmap = true;
+			var doMissions = true;
+			var noCache = false;
+			var doV2Style = true;
 			string typeFilter = null;
 			string shipFilter = null;
 
@@ -29,12 +30,13 @@ namespace Loader
 				{ "scdata=", v => scDataRoot = v },
 				{ "input=",  v => scDataRoot = v },
 				{ "output=",  v => outputRoot = v },
-				{ "noships", v => doShips = false },
-				{ "noitems", v => doItems = false },
-				{ "noshops", v => doShops = false },
-				{ "nomap", v => doStarmap = false },
-				{ "nomissions", v => doMissions = false },
-				{ "nocache", v => noCache = true },
+				{ "noships", _ => doShips = false },
+				{ "noitems", _ => doItems = false },
+				{ "noshops", _ => doShops = false },
+				{ "nomap", _ => doStarmap = false },
+				{ "noV2", _ => doV2Style = false },
+				{ "nomissions", _ => doMissions = false },
+				{ "nocache", _ => noCache = true },
 				{ "types=", v => typeFilter = v },
 				{ "ships=", v=> shipFilter = v }
 			};
@@ -49,6 +51,9 @@ namespace Loader
 				Console.WriteLine();
 				return;
 			}
+
+			var timer = new System.Diagnostics.Stopwatch();
+			timer.Start();
 
 			JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 			{
@@ -186,7 +191,7 @@ namespace Loader
 			if (doItems)
 			{
 				Console.WriteLine("Load Items");
-				var itemLoader = new ItemLoader(itemBuilder, manufacturerSvc, entitySvc, ammoSvc, itemInstaller, loadoutLoader, inventorySvc, meleeConfigSvc)
+				var itemLoader = new ItemLoader(itemBuilder, manufacturerSvc, entitySvc, ammoSvc, itemInstaller, loadoutLoader, inventorySvc, meleeConfigSvc, doV2Style)
 				{
 					OutputFolder = outputRoot,
 					DataRoot = scDataRoot,
@@ -198,7 +203,7 @@ namespace Loader
 			if (doShips)
 			{
 				Console.WriteLine("Load Ships and Vehicles");
-				var shipLoader = new ShipLoader(itemBuilder, manufacturerSvc, localisationSvc, entitySvc, itemInstaller, loadoutLoader, null, inventorySvc)//insuranceSvc)
+				var shipLoader = new ShipLoader(itemBuilder, manufacturerSvc, localisationSvc, entitySvc, itemInstaller, loadoutLoader, inventorySvc, doV2Style)
 				{
 					OutputFolder = outputRoot,
 					DataRoot = scDataRoot,
@@ -230,7 +235,9 @@ namespace Loader
 				starmapLoader.Load();
 			}
 
-			Console.WriteLine("Finished!");
+			timer.Stop();
+
+			Console.WriteLine($"Finished! Took {timer.Elapsed.TotalMinutes:n1} minutes");
 		}
 	}
 }

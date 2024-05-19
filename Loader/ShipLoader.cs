@@ -1,13 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Globalization;
-
 using Newtonsoft.Json;
-
 using scdb.Xml.Entities;
 using scdb.Xml.Vehicles;
 
@@ -18,8 +16,8 @@ namespace Loader
 		public string OutputFolder { get; set; }
 		public string DataRoot { get; set; }
 
-		string[] avoids =
-		{
+		private readonly string[] _avoids =
+		[
 			// CIG tags
 			"pu",
 			"ai",
@@ -47,36 +45,49 @@ namespace Loader
 			"advocacy",
 			"derelict",
 			"drone",
-			"eaobjectivedestructable",
-		};
+			"eaobjectivedestructable"
+		];
 
-		SortedSet<string> AcceptTypes = new SortedSet<string>();
-		SortedSet<string> InstalledTypes = new SortedSet<string>();
-		ItemBuilder itemBuilder;
-		ManufacturerService manufacturerSvc;
-		LocalisationService localisationSvc;
-		EntityService entitySvc;
-		ItemInstaller itemInstaller;
-		LoadoutLoader loadoutLoader;
-		InsuranceService insuranceSvc;
-		InventoryContainerService inventoryContainerSvc;
+		private readonly SortedSet<string> _acceptTypes = [];
+		private readonly SortedSet<string> _installedTypes = [];
+		private readonly ItemBuilder _itemBuilder;
+		private readonly ManufacturerService _manufacturerSvc;
+		private readonly LocalisationService _localisationSvc;
+		private readonly EntityService _entitySvc;
+		private readonly ItemInstaller _itemInstaller;
+		private readonly LoadoutLoader _loadoutLoader;
+		private readonly InventoryContainerService _inventoryContainerSvc;
+		private readonly bool _doV2Style;
+		private Dictionary<string, string> _vehicleImplementations;
 
-		public ShipLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, LocalisationService localisationSvc, EntityService entitySvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, InsuranceService insuranceSvc, InventoryContainerService inventoryContainerSvc)
+		public ShipLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, LocalisationService localisationSvc, EntityService entitySvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, InventoryContainerService inventoryContainerSvc, bool doV2Style)
 		{
-			this.itemBuilder = itemBuilder;
-			this.manufacturerSvc = manufacturerSvc;
-			this.localisationSvc = localisationSvc;
-			this.entitySvc = entitySvc;
-			this.itemInstaller = itemInstaller;
-			this.loadoutLoader = loadoutLoader;
-			this.insuranceSvc = insuranceSvc;
-			this.inventoryContainerSvc = inventoryContainerSvc;
+			_itemBuilder = itemBuilder;
+			_manufacturerSvc = manufacturerSvc;
+			_localisationSvc = localisationSvc;
+			_entitySvc = entitySvc;
+			_itemInstaller = itemInstaller;
+			_loadoutLoader = loadoutLoader;
+			_inventoryContainerSvc = inventoryContainerSvc;
+			_doV2Style = doV2Style;
 		}
 
 		public List<(ShipIndexEntry, StandardisedShip)> Load(string shipFilter)
 		{
+			var implPath = Path.Combine(DataRoot, "Data", "Scripts", "Entities", "Vehicles", "Implementations", "Xml");
+			var mappings = new Dictionary<string, string>();
+			foreach (var file in Directory.EnumerateFiles(implPath, "*.xml"))
+			{
+				mappings.Add(file.Split("/").Last().ToLower(), file);
+			}
+
+			_vehicleImplementations = mappings;
+
 			Directory.CreateDirectory(Path.Combine(OutputFolder, "ships"));
-			Directory.CreateDirectory(Path.Combine(OutputFolder, "v2", "ships"));
+			if (_doV2Style)
+			{
+				Directory.CreateDirectory(Path.Combine(OutputFolder, "v2", "ships"));
+			}
 
 			var index = new List<(ShipIndexEntry, StandardisedShip)>();
 			index.AddRange(LoadFolder(Path.Join("Data", "Libs", "Foundry", "Records", "entities", "spaceships"), shipFilter));
@@ -85,19 +96,26 @@ namespace Loader
 			var oldIndexItems = index.Select(x => x.Item1).ToList();
 			var newIndexItems = index.Select(x => x.Item2).ToList();
 
-			File.WriteAllText(Path.Combine(OutputFolder, "ships.json"), JsonConvert.SerializeObject(oldIndexItems));
-			File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships.json"), JsonConvert.SerializeObject(newIndexItems));
+			if (_doV2Style)
+			{
+				File.WriteAllText(Path.Combine(OutputFolder, "ships.json"), JsonConvert.SerializeObject(oldIndexItems));
+				File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships.json"), JsonConvert.SerializeObject(newIndexItems));
+			}
+			else
+			{
+				File.WriteAllText(Path.Combine(OutputFolder, "ships.json"), JsonConvert.SerializeObject(newIndexItems));
+			}
 
 			Console.WriteLine();
 			Console.WriteLine("*** All accepted types ***");
-			foreach (var type in AcceptTypes)
+			foreach (var type in _acceptTypes)
 			{
 				Console.WriteLine(type);
 			}
 
 			Console.WriteLine();
 			Console.WriteLine("*** All installed types ***");
-			foreach (var type in InstalledTypes)
+			foreach (var type in _installedTypes)
 			{
 				Console.WriteLine(type);
 			}
@@ -123,18 +141,7 @@ namespace Loader
 
 				(var vehicle, var entity, var parts, var ship, var ports) = shipTuple.Value;
 
-				File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}.json"), JsonConvert.SerializeObject(ship));
-				File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}-parts.json"), JsonConvert.SerializeObject(parts));
-				File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}-ports.json"), JsonConvert.SerializeObject(ports));
-
-				var v2json = JsonConvert.SerializeObject(new
-				{
-					Entity = entity,
-					Vehicle = vehicle
-				});
-				File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}-raw.json"), v2json);
-
-				var v1json = JsonConvert.SerializeObject(new
+				var v1Json = JsonConvert.SerializeObject(new
 				{
 					Raw = new
 					{
@@ -142,7 +149,28 @@ namespace Loader
 						Vehicle = vehicle,
 					}
 				});
-				File.WriteAllText(Path.Combine(OutputFolder, "ships", $"{entity.ClassName.ToLower()}.json"), v1json);
+
+				if (_doV2Style)
+				{
+					var v2Json = JsonConvert.SerializeObject(new
+					{
+						Entity = entity,
+						Vehicle = vehicle
+					});
+
+					File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}.json"), JsonConvert.SerializeObject(ship));
+					File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}-parts.json"), JsonConvert.SerializeObject(parts));
+					File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}-ports.json"), JsonConvert.SerializeObject(ports));
+					File.WriteAllText(Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}-raw.json"), v2Json);
+
+					File.WriteAllText(Path.Combine(OutputFolder, "ships", $"{entity.ClassName.ToLower()}.json"), v1Json);
+				}
+				else
+				{
+					File.WriteAllText(Path.Combine(OutputFolder, "ships", $"{entity.ClassName.ToLower()}-raw.json"), v1Json);
+					File.WriteAllText(Path.Combine(OutputFolder, "ships", $"{entity.ClassName.ToLower()}.json"), JsonConvert.SerializeObject(ship));
+				}
+
 
 				// Index entry
 				var indexEntry = CreateIndexEntry(entity, vehicle, ship);
@@ -156,8 +184,6 @@ namespace Loader
 
 		(Vehicle, EntityClassDefinition, List<StandardisedPart>, StandardisedShip, StandardisedPortSummary)? LoadShip(string entityFilename)
 		{
-		    Console.WriteLine(entityFilename);
-
 			var entity = LoadEntity(entityFilename);
 			var vehicle = LoadVehicle(entity);
 
@@ -178,7 +204,7 @@ namespace Loader
 		bool avoidFile(string filename)
 		{
 			var fileSplit = Path.GetFileNameWithoutExtension(filename).Split('_');
-			return fileSplit.Any(part => avoids.Contains(part));
+			return fileSplit.Any(part => _avoids.Contains(part));
 		}
 
 		ShipIndexEntry CreateIndexEntry(EntityClassDefinition entity, Vehicle vehicle, StandardisedShip shipSummary)
@@ -186,15 +212,15 @@ namespace Loader
 			bool isGroundVehicle = entity.Components?.VehicleComponentParams.vehicleCareer == "@vehicle_focus_ground";
 			bool isGravlevVehicle = entity.Components?.VehicleComponentParams.isGravlevVehicle ?? false;
 			bool isSpaceship = !(isGroundVehicle || isGravlevVehicle);
-			var manufacturer = manufacturerSvc.GetManufacturer(entity.Components?.VehicleComponentParams.manufacturer, entity.ClassName);
+			var manufacturer = _manufacturerSvc.GetManufacturer(entity.Components?.VehicleComponentParams?.manufacturer, entity.ClassName);
 
 			var indexEntry = new ShipIndexEntry
 			{
 				className = entity.ClassName,
-				name = entity.Components?.VehicleComponentParams.vehicleName,
-				career = entity.Components?.VehicleComponentParams.vehicleCareer,
-				role = entity.Components?.VehicleComponentParams.vehicleRole,
-				dogFightEnabled = Convert.ToBoolean(entity.Components?.VehicleComponentParams.dogfightEnabled),
+				name = entity.Components?.VehicleComponentParams?.vehicleName,
+				career = entity.Components?.VehicleComponentParams?.vehicleCareer,
+				role = entity.Components?.VehicleComponentParams?.vehicleRole,
+				dogFightEnabled = Convert.ToBoolean(entity.Components?.VehicleComponentParams?.dogfightEnabled),
 				size = shipSummary?.Size,
 				isGroundVehicle = isGroundVehicle,
 				isGravlevVehicle = isGravlevVehicle,
@@ -209,7 +235,7 @@ namespace Loader
 
 		EntityClassDefinition LoadEntity(string entityFilename)
 		{
-			var entity = entitySvc.GetByFilename(entityFilename);
+			var entity = _entitySvc.GetByFilename(entityFilename);
 			return entity;
 		}
 
@@ -220,7 +246,16 @@ namespace Loader
 			    return null;
 			}
 
-			vehicleFilename = Path.Combine(DataRoot, "Data", Path.Join(vehicleFilename.Split('/')));
+			var search = vehicleFilename.Split('/').Last().ToLower();
+
+			if (!_vehicleImplementations.ContainsKey(search.ToLower()))
+			{
+				Console.WriteLine("Vehicle implementation " + search + " not Found.");
+				return null;
+			}
+
+			vehicleFilename = _vehicleImplementations[search.ToLower()];
+
 			var vehicleModification = entity.Components?.VehicleComponentParams?.modification;
 
 			if (String.IsNullOrEmpty(vehicleModification)) Console.WriteLine(vehicleFilename);
@@ -271,22 +306,25 @@ namespace Loader
 				sb.Append($"{port.Category,-40}");
 				sb.AppendLine();
 
-				if (port.Types != null) foreach (var t in port.Types) AcceptTypes.Add(t);
-				if (port.InstalledItem?.Type != null) InstalledTypes.Add(port.InstalledItem.Type);
+				if (port.Types != null) foreach (var t in port.Types) _acceptTypes.Add(t);
+				if (port.InstalledItem?.Type != null) _installedTypes.Add(port.InstalledItem.Type);
 			}
 			sb.AppendLine();
 
-			var newFilename = Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}-dump.txt");
-			File.WriteAllText(newFilename, sb.ToString());
+			if (_doV2Style)
+			{
+				var newFilename = Path.Combine(OutputFolder, "v2", "ships", $"{entity.ClassName.ToLower()}-dump.txt");
+				File.WriteAllText(newFilename, sb.ToString());
+			}
 		}
 
 		List<StandardisedPart> InitialiseShip(EntityClassDefinition entity, Vehicle vehicle)
 		{
-			var loadout = loadoutLoader.Load(entity);
+			var loadout = _loadoutLoader.Load(entity);
 
 			var partList = vehicle != null ? BuildPartList(vehicle.Parts) : DeducePartList(loadout);
 
-			itemInstaller.InstallLoadout(partList, loadout);
+			_itemInstaller.InstallLoadout(partList, loadout);
 
 			InstallFakeItems(partList);
 
@@ -386,13 +424,13 @@ namespace Loader
 				var major = partType.type;
 				if (String.IsNullOrWhiteSpace(major)) continue;
 
-				if (String.IsNullOrWhiteSpace(partType.subtypes)) types.Add(itemBuilder.BuildTypeName(major, null));
+				if (String.IsNullOrWhiteSpace(partType.subtypes)) types.Add(_itemBuilder.BuildTypeName(major, null));
 				else
 				{
 					foreach (var subType in partType.subtypes.Split(","))
 					{
 						var minor = subType;
-						types.Add(itemBuilder.BuildTypeName(major, minor));
+						types.Add(_itemBuilder.BuildTypeName(major, minor));
 					}
 				}
 			}
@@ -512,20 +550,19 @@ namespace Loader
 		StandardisedShip BuildShipSummary(EntityClassDefinition entity, List<StandardisedPart> parts, StandardisedPortSummary portSummary, Vehicle vehicle)
 		{
 			StandardisedInventoryContainer inventorySize = null;
-			if (entity.Components?.VehicleComponentParams.inventoryContainerParams.Length > 0)
+			if (entity.Components?.VehicleComponentParams?.inventoryContainerParams?.Length > 0)
 			{
-				inventorySize = inventoryContainerSvc.GetInventoryContainer(entity.Components?.VehicleComponentParams
-					.inventoryContainerParams);
+				inventorySize = _inventoryContainerSvc.GetInventoryContainer(entity.Components?.VehicleComponentParams?.inventoryContainerParams);
 			}
 
 			var shipSummary = new StandardisedShip
 			{
 				ClassName = entity.ClassName,
-				Name = localisationSvc.GetText(entity.Components?.VehicleComponentParams.vehicleName, entity.ClassName),
-				Description = localisationSvc.GetText(entity.Components?.VehicleComponentParams.vehicleDescription),
-				Career = localisationSvc.GetText(entity.Components?.VehicleComponentParams.vehicleCareer),
-				Role = localisationSvc.GetText(entity.Components?.VehicleComponentParams.vehicleRole),
-				Manufacturer = manufacturerSvc.GetManufacturer(entity.Components?.VehicleComponentParams.manufacturer, entity.ClassName),
+				Name = _localisationSvc.GetText(entity.Components?.VehicleComponentParams?.vehicleName, entity.ClassName),
+				Description = _localisationSvc.GetText(entity.Components?.VehicleComponentParams?.vehicleDescription),
+				Career = _localisationSvc.GetText(entity.Components?.VehicleComponentParams?.vehicleCareer),
+				Role = _localisationSvc.GetText(entity.Components?.VehicleComponentParams?.vehicleRole),
+				Manufacturer = _manufacturerSvc.GetManufacturer(entity.Components?.VehicleComponentParams?.manufacturer, entity.ClassName),
 				Size = entity.Components?.SAttachableComponentParams?.AttachDef?.Size ?? 0,
 				Width = entity.Components?.VehicleComponentParams?.maxBoundingBoxSize?.x ?? 0,
 				Length = entity.Components?.VehicleComponentParams?.maxBoundingBoxSize?.y ?? 0,

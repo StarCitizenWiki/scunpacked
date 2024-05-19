@@ -2,11 +2,8 @@
 
 namespace scdb.Xml.Entities
 {
-	public class InventoryContainer
+	public class InventoryContainer: ClassBase
 	{
-		[XmlAttribute]
-		public string __ref;
-
 		public InteriorDimensions interiorDimensions;
 		public InventoryType inventoryType;
 	}

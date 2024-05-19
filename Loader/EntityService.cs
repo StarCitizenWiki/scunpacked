@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using scdb.Xml.Entities;
@@ -14,11 +15,11 @@ namespace Loader
 		public string OutputFolder { get; set; }
 		public string DataRoot { get; set; }
 
-		Dictionary<string, string> classNameToFilenameMap;
-		Dictionary<string, string> referenceToClassNameMap;
-		Dictionary<string, string> classNameToTypeMap;
-		Dictionary<string, EntityClassDefinition> classNameToEntityMap;
-		ClassParser<EntityClassDefinition> entityParser = new ClassParser<EntityClassDefinition>();
+		ConcurrentDictionary<string, string> classNameToFilenameMap;
+		ConcurrentDictionary<string, string> referenceToClassNameMap;
+		public ConcurrentDictionary<string, string> classNameToTypeMap;
+		ConcurrentDictionary<string, EntityClassDefinition> classNameToEntityMap;
+		ClassParser<EntityClassDefinition> entityParser = new ();
 		bool verbose = true;
 
 		// Avoid filenames that have these endings
@@ -51,20 +52,20 @@ namespace Loader
 			var referenceCache = Path.Combine(DataRoot, "classReferences-scunpacked.json");
 			var typeCache = Path.Combine(DataRoot, "classTypes-scunpacked.json");
 
-			classNameToEntityMap = new Dictionary<string, EntityClassDefinition>();
+			classNameToEntityMap = new ConcurrentDictionary<string, EntityClassDefinition>();
 
 			if (!rebuildCache && File.Exists(filenameCache) && File.Exists(referenceCache) && File.Exists(typeCache))
 			{
 				Console.WriteLine($"EntityService: Using the existing entity cache found in {DataRoot}");
 
 				var filenameContents = File.ReadAllText(filenameCache);
-				classNameToFilenameMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(filenameContents);
+				classNameToFilenameMap = JsonConvert.DeserializeObject<ConcurrentDictionary<string, string>>(filenameContents);
 
 				var referenceContents = File.ReadAllText(referenceCache);
-				referenceToClassNameMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(referenceContents);
+				referenceToClassNameMap = JsonConvert.DeserializeObject<ConcurrentDictionary<string, string>>(referenceContents);
 
 				var typeContents = File.ReadAllText(typeCache);
-				classNameToTypeMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(typeContents);
+				classNameToTypeMap = JsonConvert.DeserializeObject<ConcurrentDictionary<string, string>>(typeContents);
 			}
 			else
 			{
@@ -72,9 +73,9 @@ namespace Loader
 				var timer = new System.Diagnostics.Stopwatch();
 				timer.Start();
 
-				classNameToFilenameMap = new Dictionary<string, string>();
-				referenceToClassNameMap = new Dictionary<string, string>();
-				classNameToTypeMap = new Dictionary<string, string>();
+				classNameToFilenameMap = new ConcurrentDictionary<string, string>();
+				referenceToClassNameMap = new ConcurrentDictionary<string, string>();
+				classNameToTypeMap = new ConcurrentDictionary<string, string>();
 
 				BuildItemDirectory(Path.Join("Data", "Libs", "Foundry", "Records", "entities", "scitem"));
 				//BuildItemDirectory(@"Data\Libs\Foundry\Records\entities\scitem\ships");
@@ -99,7 +100,7 @@ namespace Loader
 			if (classNameToFilenameMap.ContainsKey(className))
 			{
 				var entity = LoadEntity(classNameToFilenameMap[className]);
-				classNameToEntityMap.Add(className, entity);
+				classNameToEntityMap.TryAdd(className, entity);
 				return entity;
 			}
 
@@ -123,10 +124,10 @@ namespace Loader
 			if (entity == null) return null;
 
             if (!classNameToFilenameMap.ContainsKey(entity.ClassName)) {
-                classNameToFilenameMap.Add(entity.ClassName, filename);
-                referenceToClassNameMap.Add(entity.__ref, entity.ClassName);
-                classNameToEntityMap.Add(entity.ClassName, entity);
-                classNameToTypeMap.Add(entity.ClassName, entity.Components.SAttachableComponentParams?.AttachDef.Type ?? "");
+                classNameToFilenameMap.TryAdd(entity.ClassName, filename);
+                referenceToClassNameMap.TryAdd(entity.__ref, entity.ClassName);
+                classNameToEntityMap.TryAdd(entity.ClassName, entity);
+                classNameToTypeMap.TryAdd(entity.ClassName, entity.Components.SAttachableComponentParams?.AttachDef.Type ?? "");
             }
 
 			return entity;
@@ -146,17 +147,19 @@ namespace Loader
 
 		void BuildItemDirectory(string folder)
 		{
-			foreach (var filename in Directory.EnumerateFiles(Path.Combine(DataRoot, folder), "*.xml", SearchOption.AllDirectories))
-			{
-				if (avoidFile(filename)) continue;
+			Parallel.ForEach(
+				Directory.EnumerateFiles(Path.Combine(DataRoot, folder), "*.xml", SearchOption.AllDirectories),
+				filename =>
+				{
+					if (avoidFile(filename)) return;
 
-				var entity = LoadEntity(filename);
+					var entity = LoadEntity(filename);
 
-				classNameToFilenameMap.Add(entity.ClassName, filename);
-				referenceToClassNameMap.Add(entity.__ref, entity.ClassName);
-				classNameToEntityMap.Add(entity.ClassName, entity);
-				classNameToTypeMap.Add(entity.ClassName, entity.Components?.SAttachableComponentParams?.AttachDef.Type ?? "");
-			}
+					classNameToFilenameMap.TryAdd(entity.ClassName, filename);
+					referenceToClassNameMap.TryAdd(entity.__ref, entity.ClassName);
+					classNameToEntityMap.TryAdd(entity.ClassName, entity);
+					classNameToTypeMap.TryAdd(entity.ClassName, entity.Components?.SAttachableComponentParams?.AttachDef.Type ?? "");
+				});
 		}
 
 		EntityClassDefinition LoadEntity(string filename)

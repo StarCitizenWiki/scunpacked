@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using scdb.Xml.Entities;
@@ -14,19 +16,20 @@ namespace Loader
 		public string OutputFolder { get; set; }
 		public string DataRoot { get; set; }
 
-		ItemBuilder itemBuilder;
-		ManufacturerService manufacturerSvc;
-		ItemClassifier itemClassifier;
-		EntityService entitySvc;
-		AmmoService ammoSvc;
-		ItemInstaller itemInstaller;
-		LoadoutLoader loadoutLoader;
-		InventoryContainerService _inventoryContainerSvc;
-		MeleeCombatService meleeConfigSvc;
+		private readonly ItemBuilder _itemBuilder;
+		private readonly ManufacturerService _manufacturerSvc;
+		private readonly ItemClassifier _itemClassifier;
+		private readonly EntityService _entitySvc;
+		private readonly AmmoService _ammoSvc;
+		private readonly ItemInstaller _itemInstaller;
+		private readonly LoadoutLoader _loadoutLoader;
+		private readonly InventoryContainerService _inventoryContainerSvc;
+		private readonly MeleeCombatService _meleeConfigSvc;
+		private readonly bool _doV2Style;
 
 		// Don't dump items with these types
-		string[] type_avoids =
-		{
+		private readonly string[] _typeAvoids =
+		[
 			"UNDEFINED",
 			"airtrafficcontroller",
 			"button",
@@ -45,25 +48,29 @@ namespace Loader
 			"flair_surface",
 			"flair_wall",
 			"removablechip",
-		};
+		];
 
-		public ItemLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, EntityService entitySvc, AmmoService ammoSvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, InventoryContainerService inventoryContainerSvc, MeleeCombatService meleeConfigSvc)
+		public ItemLoader(ItemBuilder itemBuilder, ManufacturerService manufacturerSvc, EntityService entitySvc, AmmoService ammoSvc, ItemInstaller itemInstaller, LoadoutLoader loadoutLoader, InventoryContainerService inventoryContainerSvc, MeleeCombatService meleeConfigSvc, bool doV2Style)
 		{
-			this.itemBuilder = itemBuilder;
-			this.manufacturerSvc = manufacturerSvc;
-			itemClassifier = new ItemClassifier();
-			this.entitySvc = entitySvc;
-			this.ammoSvc = ammoSvc;
-			this.itemInstaller = itemInstaller;
-			this.loadoutLoader = loadoutLoader;
-			this.meleeConfigSvc = meleeConfigSvc;
+			_itemBuilder = itemBuilder;
+			_manufacturerSvc = manufacturerSvc;
+			_itemClassifier = new ItemClassifier();
+			_entitySvc = entitySvc;
+			_ammoSvc = ammoSvc;
+			_itemInstaller = itemInstaller;
+			_loadoutLoader = loadoutLoader;
+			_meleeConfigSvc = meleeConfigSvc;
 			_inventoryContainerSvc = inventoryContainerSvc;
+			_doV2Style = doV2Style;
 		}
 
-		public List<ItemIndexEntry> Load(string typeFilter = null)
+		public ConcurrentBag<ItemIndexEntry> Load(string typeFilter = null)
 		{
 			Directory.CreateDirectory(Path.Combine(OutputFolder, "items"));
-			Directory.CreateDirectory(Path.Combine(OutputFolder, "v2", "items"));
+			if (_doV2Style)
+			{
+				Directory.CreateDirectory(Path.Combine(OutputFolder, "v2", "items"));
+			}
 
 			var damageResistanceMacros = LoadDamageResistanceMacros();
 
@@ -75,13 +82,13 @@ namespace Loader
 			Console.WriteLine($"ItemLoader: Creating {index.Count} item files...");
 			foreach (var item in index)
 			{
-				var entity = entitySvc.GetByClassName(item.className);
+				var entity = _entitySvc.GetByClassName(item.className);
 
 				// If uses an ammunition magazine, then load it
 				EntityClassDefinition magazine = null;
 				if (!String.IsNullOrEmpty(entity.Components?.SCItemWeaponComponentParams?.ammoContainerRecord))
 				{
-					magazine = entitySvc.GetByReference(entity.Components.SCItemWeaponComponentParams.ammoContainerRecord);
+					magazine = _entitySvc.GetByReference(entity.Components.SCItemWeaponComponentParams.ammoContainerRecord);
 				}
 
 				// If it is an ammo container or if it has a magazine then load the ammo properties
@@ -89,14 +96,14 @@ namespace Loader
 				var ammoRef = magazine?.Components?.SAmmoContainerComponentParams?.ammoParamsRecord ?? entity.Components?.SAmmoContainerComponentParams?.ammoParamsRecord;
 				if (!String.IsNullOrEmpty(ammoRef))
 				{
-					ammoEntry = ammoSvc.GetByReference(ammoRef);
+					ammoEntry = _ammoSvc.GetByReference(ammoRef);
 				}
 
 				MeleeCombatConfig combatConfig = null;
 				var combatRef = entity?.Components?.SMeleeWeaponComponentParams?.meleeCombatConfig;
 				if (!String.IsNullOrEmpty(combatRef))
 				{
-					combatConfig = meleeConfigSvc.GetByReference(combatRef);
+					combatConfig = _meleeConfigSvc.GetByReference(combatRef);
 				}
 
 				DamageResistance damageResistances = null;
@@ -112,23 +119,24 @@ namespace Loader
 					inventoryContainer = _inventoryContainerSvc.GetInventoryContainer(entity.Components.SCItemInventoryContainerComponentParams.containerParams);
 				}
 
-				var stdItem = itemBuilder.BuildItem(entity);
-				var loadout = loadoutLoader.Load(entity);
-				itemInstaller.InstallLoadout(stdItem, loadout);
-				itemInstaller.InstallLoadout(entity, loadout);
+				var stdItem = _itemBuilder.BuildItem(entity);
+				var loadout = _loadoutLoader.Load(entity);
+				_itemInstaller.InstallLoadout(stdItem, loadout);
+				_itemInstaller.InstallLoadout(entity, loadout);
 
 				stdItem.Classification = item.classification;
 				item.stdItem = stdItem;
 
-				File.WriteAllText(Path.Combine(OutputFolder, "v2", "items", $"{entity.ClassName.ToLower()}.json"), JsonConvert.SerializeObject(stdItem));
-				File.WriteAllText(Path.Combine(OutputFolder, "v2", "items", $"{entity.ClassName.ToLower()}-raw.json"), JsonConvert.SerializeObject(entity));
+				if (_doV2Style)
+				{
+					File.WriteAllText(Path.Combine(OutputFolder, "v2", "items", $"{entity.ClassName.ToLower()}.json"), JsonConvert.SerializeObject(stdItem));
+					File.WriteAllText(Path.Combine(OutputFolder, "v2", "items", $"{entity.ClassName.ToLower()}-raw.json"), JsonConvert.SerializeObject(entity));
+				}
 
 				// Write the JSON of this entity to its own file
 				var jsonFilename = Path.Combine(OutputFolder, "items", $"{entity.ClassName.ToLower()}.json");
 				var json = JsonConvert.SerializeObject(new
 				{
-					magazine,
-					ammo = ammoEntry,
 					Raw = new
 					{
 						Entity = entity,
@@ -136,6 +144,8 @@ namespace Loader
 					damageResistances,
 					inventoryContainer,
 					combatConfig,
+					magazine,
+					ammo = ammoEntry,
 				});
 				File.WriteAllText(jsonFilename, json);
 			}
@@ -178,27 +188,35 @@ namespace Loader
 			return damageResistanceMacros;
 		}
 
-		List<ItemIndexEntry> CreateIndex(string typeFilter)
+		ConcurrentBag<ItemIndexEntry> CreateIndex(string typeFilter)
 		{
-			var index = new List<ItemIndexEntry>();
+			var timer = new System.Diagnostics.Stopwatch();
+			timer.Start();
+			var index = new ConcurrentBag<ItemIndexEntry> ();
+			var types = typeFilter?.Split(',') ?? new string[0];
 
-			foreach (var entity in entitySvc.GetAll(typeFilter))
+			Parallel.ForEach(_entitySvc.classNameToTypeMap, entity =>
 			{
-				// Skip types that are not very interesting
-				if (avoidType(entity.Components?.SAttachableComponentParams?.AttachDef.Type)) continue;
+				if (types.Length > 0 && !types.Contains(entity.Value)) return;
 
-				var indexEntry = CreateIndexEntry(entity);
+				var entityDef = _entitySvc.GetByClassName(entity.Key);
+				if (AvoidType(entityDef.Components?.SAttachableComponentParams?.AttachDef.Type)) return;
+				var indexEntry = CreateIndexEntry(entityDef);
 
 				// Add it to the item index
 				index.Add(indexEntry);
-			}
+			});
+
+			timer.Stop();
+
+			Console.WriteLine($"ItemLoader: Loading items took {timer.Elapsed.TotalMinutes:n1} minutes");
 
 			return index;
 		}
 
 		ItemIndexEntry CreateIndexEntry(EntityClassDefinition entity)
 		{
-			var classification = itemClassifier.Classify(entity);
+			var classification = _itemClassifier.Classify(entity);
 
 			var indexEntry = new ItemIndexEntry
 			{
@@ -211,16 +229,16 @@ namespace Loader
 				grade = entity.Components?.SAttachableComponentParams?.AttachDef.Grade,
 				name = entity.Components?.SAttachableComponentParams?.AttachDef.Localization.Name,
 				tags = entity.Components?.SAttachableComponentParams?.AttachDef.Tags,
-				manufacturer = manufacturerSvc.GetManufacturer(entity.Components?.SAttachableComponentParams?.AttachDef.Manufacturer, entity.ClassName)?.Code,
+				manufacturer = _manufacturerSvc.GetManufacturer(entity.Components?.SAttachableComponentParams?.AttachDef.Manufacturer, entity.ClassName)?.Code,
 				classification = classification
 			};
 			return indexEntry;
 		}
 
-		bool avoidType(string type)
+		private bool AvoidType(string type)
 		{
 			if (type == null) return true;
-			return type_avoids.Contains(type, StringComparer.OrdinalIgnoreCase);
+			return _typeAvoids.Contains(type, StringComparer.OrdinalIgnoreCase);
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using Newtonsoft.Json;
+using scdb.Xml.Entities;
 
 namespace Loader
 {
@@ -23,7 +24,7 @@ namespace Loader
 		List<InventoryContainerIndexEntry> Load(string entityFolder)
 		{
 			var index = new List<InventoryContainerIndexEntry>();
-			var parser = new InventoryContainerParser();
+			var parser = new ClassParser<InventoryContainer>();
 
 			foreach (var entityFilename in Directory.EnumerateFiles(Path.Combine(DataRoot, entityFolder), "*.xml", SearchOption.AllDirectories))
 			{
