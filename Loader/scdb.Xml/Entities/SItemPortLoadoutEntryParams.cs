@@ -11,6 +11,9 @@ namespace scdb.Xml.Entities
 		[XmlAttribute]
 		public string entityClassName;
 
+		[XmlAttribute]
+		public string entityClassReference;
+
 		public loadout loadout;
 	}
 }
