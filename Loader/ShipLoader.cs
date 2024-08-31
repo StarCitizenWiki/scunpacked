@@ -404,7 +404,7 @@ namespace Loader
 			var stdPort = new StandardisedItemPort
 			{
 				PortName = part.name,
-				Size = part.ItemPort.maxsize,
+				Size = part.ItemPort.maxSize,
 				Types = BuildPortTypes(part),
 				Flags = BuildPortFlags(part),
 			};
@@ -527,12 +527,13 @@ namespace Loader
 			portSummary.UtilityTurrets = FindItemPorts(parts, x => x.Category == "Utility turrets", true).Select(x => x.Item1).ToList();
 
 			// Other hardpoints
-			portSummary.InterdictionHardpoints = FindItemPorts(parts, x => x.Category == "EMP hardpoints" || x.Category == "QIG hardpoints", true).Select(x => x.Item1).ToList();
+			portSummary.InterdictionHardpoints = FindItemPorts(parts, x => x.Category is "EMP hardpoints" or "QIG hardpoints", true).Select(x => x.Item1).ToList();
 			portSummary.MissileRacks = FindItemPorts(parts, x => x.Category == "Missile racks", true).Select(x => x.Item1).ToList();
 			portSummary.PowerPlants = FindItemPorts(parts, x => x.Category == "Power plants", true).Select(x => x.Item1).ToList();
 			portSummary.Coolers = FindItemPorts(parts, x => x.Category == "Coolers", true).Select(x => x.Item1).ToList();
 			portSummary.Shields = FindItemPorts(parts, x => x.Category == "Shield generators", true).Select(x => x.Item1).ToList();
-			portSummary.CargoGrids = FindItemPorts(parts, x => x.Category == "Cargo grids", true).Select(x => x.Item1).ToList();
+			// portSummary.CargoGrids = FindItemPorts(parts, x => x.InstalledItem is { Type: "Cargo" or "CargoGrid" or "Container" } && !x.InstalledItem.ClassName.Contains("storage") && !x.InstalledItem.ClassName.Contains("personal"), true).Select(x => x.Item1).ToList();
+			portSummary.CargoGrids = FindItemPorts(parts, x => x.InstalledItem?.InventoryContainer != null, true).Select(x => x.Item1).ToList();
 			portSummary.Countermeasures = FindItemPorts(parts, x => x.Category == "Countermeasures", true).Select(x => x.Item1).ToList();
 			portSummary.MainThrusters = FindItemPorts(parts, x => x.Category == "Main thrusters", true).Select(x => x.Item1).ToList();
 			portSummary.RetroThrusters = FindItemPorts(parts, x => x.Category == "Retro thrusters", true).Select(x => x.Item1).ToList();
@@ -542,7 +543,7 @@ namespace Loader
 			portSummary.HydrogenFuelTanks = FindItemPorts(parts, x => x.Category == "Fuel tanks", true).Select(x => x.Item1).ToList();
 			portSummary.QuantumDrives = FindItemPorts(parts, x => x.Category == "Quantum drives", true).Select(x => x.Item1).ToList();
 			portSummary.QuantumFuelTanks = FindItemPorts(parts, x => x.Category == "Quantum fuel tanks", true).Select(x => x.Item1).ToList();
-			portSummary.Avionics = FindItemPorts(parts, x => x.Category == "Scanners" || x.Category == "Pings" || x.Category == "Radars" || x.Category == "Transponders", true).Select(x => x.Item1).ToList();
+			portSummary.Avionics = FindItemPorts(parts, x => x.Category is "Scanners" or "Pings" or "Radars" or "Transponders", true).Select(x => x.Item1).ToList();
 
 			return portSummary;
 		}
@@ -553,6 +554,24 @@ namespace Loader
 			if (entity.Components?.VehicleComponentParams?.inventoryContainerParams?.Length > 0)
 			{
 				inventorySize = _inventoryContainerSvc.GetInventoryContainer(entity.Components?.VehicleComponentParams?.inventoryContainerParams);
+			}
+
+			var cargo = (double)(portSummary.CargoGrids
+				.Where(x => x.InstalledItem?.InventoryContainer != null)
+				.Sum(x => x.InstalledItem.InventoryContainer.SCU));
+
+			if (entity.Components?.SEntityComponentDefaultLoadoutParams.loadout.SItemPortLoadoutManualParams.entries !=
+			    null)
+			{
+				cargo = entity.Components?.SEntityComponentDefaultLoadoutParams.loadout.SItemPortLoadoutManualParams
+					.entries
+					.Where(x => x.entityClassName != null)
+					.Select(x => _entitySvc.GetByClassName(x.entityClassName))
+					.Select(x => x?.Components?.SCItemInventoryContainerComponentParams)
+					.Where(x => x != null)
+					.Select(x => _inventoryContainerSvc.GetInventoryContainer(x.containerParams))
+					.Where(x => x != null)
+					.Sum(x => (x.SCU == 0 && x.x > 0) ? (x.x * x.y * x.z) / 1.953125 : x.SCU) ?? 0;
 			}
 
 			var shipSummary = new StandardisedShip
@@ -571,10 +590,7 @@ namespace Loader
 				WeaponCrew = portSummary.MannedTurrets.Count + portSummary.RemoteTurrets.Count,
 				OperationsCrew = Math.Max(portSummary.MiningTurrets.Count, portSummary.UtilityTurrets.Count),
 				Mass = FindParts(parts, x => true).Sum((x) => x.Item1.Mass ?? 0),
-				Cargo = (int)(portSummary.CargoGrids
-					.Where(x => x.InstalledItem?.CargoGrid != null)
-					.Where(x => !x.InstalledItem.CargoGrid.MiningOnly)
-					.Sum(x => x.InstalledItem.CargoGrid.Capacity)),
+				Cargo = cargo,
 				Inventory = inventorySize,
 			//	Insurance = insuranceSvc.GetInsurance(entity.ClassName)
 			};

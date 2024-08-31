@@ -7,10 +7,10 @@ namespace scdb.Xml.Vehicles
 	public class ItemPort
 	{
 		[XmlAttribute]
-		public int minsize;
+		public int minSize;
 
 		[XmlAttribute]
-		public int maxsize;
+		public int maxSize;
 
 		[XmlAttribute]
 		public string display_name;
