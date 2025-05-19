@@ -46,7 +46,7 @@ jobs:
           cp -r publish/* release/
         shell: bash
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-build
           path: release/*
@@ -77,7 +77,7 @@ jobs:
           cp -r publish/* release/
         shell: bash
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: windows-build
           path: release/*
@@ -88,12 +88,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         id: download-linux
         with:
           name: linux-build
           path: linux-release
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         id: download-windows
         with:
           name: windows-build
