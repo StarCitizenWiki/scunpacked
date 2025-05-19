@@ -494,10 +494,20 @@ namespace Loader
 					break;
 
 				case SWeaponActionFireChargedParams p:
-					mode.RoundsPerMinute = p.weaponAction.SWeaponActionFireSingleParams?.fireRate ?? p.weaponAction.SWeaponActionFireBurstParams.fireRate;
 					mode.FireType = "charged";
-					mode.AmmoPerShot = p.weaponAction.SWeaponActionFireSingleParams?.launchParams.SProjectileLauncher.ammoCost ?? p.weaponAction.SWeaponActionFireBurstParams.launchParams.SProjectileLauncher.ammoCost;
-					mode.PelletsPerShot = p.weaponAction.SWeaponActionFireSingleParams?.launchParams.SProjectileLauncher.pelletCount ?? p.weaponAction.SWeaponActionFireBurstParams.launchParams.SProjectileLauncher.pelletCount;
+
+					if (p.weaponAction?.SWeaponActionFireSingleParams != null)
+					{
+						mode.RoundsPerMinute = p.weaponAction.SWeaponActionFireSingleParams.fireRate;
+						mode.AmmoPerShot = p.weaponAction.SWeaponActionFireSingleParams.launchParams.SProjectileLauncher?.ammoCost ?? 1;
+						mode.PelletsPerShot = p.weaponAction.SWeaponActionFireSingleParams.launchParams.SProjectileLauncher?.pelletCount ?? 1;
+					}
+					else if (p.weaponAction?.SWeaponActionFireBurstParams != null)
+					{
+						mode.RoundsPerMinute = p.weaponAction.SWeaponActionFireBurstParams.fireRate;
+						mode.AmmoPerShot = p.weaponAction.SWeaponActionFireBurstParams.launchParams.SProjectileLauncher?.ammoCost ?? 1;
+						mode.PelletsPerShot = p.weaponAction.SWeaponActionFireBurstParams.launchParams.SProjectileLauncher?.pelletCount ?? 1;
+					}
 					break;
 
 				case SWeaponActionFireHealingBeamParams p:
@@ -517,15 +527,31 @@ namespace Loader
 					break;
 
 				case SWeaponActionSequenceParams p:
-					mode = BuildWeaponModeInfo((SWeaponActionParams)p.sequenceEntries[0].weaponAction.SWeaponActionFireSingleParams ?? (SWeaponActionParams)p.sequenceEntries[0].weaponAction.SWeaponActionFireBurstParams);
+					if (p.sequenceEntries != null && p.sequenceEntries.Length > 0 && p.sequenceEntries[0].weaponAction != null)
+					{
+						SWeaponActionParams weaponAction = null;
+						if (p.sequenceEntries[0].weaponAction.SWeaponActionFireSingleParams != null)
+						{
+							weaponAction = p.sequenceEntries[0].weaponAction.SWeaponActionFireSingleParams;
+						}
+						else if (p.sequenceEntries[0].weaponAction.SWeaponActionFireBurstParams != null)
+						{
+							weaponAction = p.sequenceEntries[0].weaponAction.SWeaponActionFireBurstParams;
+						}
+
+						if (weaponAction != null)
+						{
+							mode = BuildWeaponModeInfo(weaponAction);
+						}
+					}
 					mode.FireType = "sequence";
 					break;
 
 				case SWeaponActionFireBurstParams p:
 					mode.RoundsPerMinute = p.fireRate;
 					mode.FireType = "burst";
-					mode.AmmoPerShot = p.launchParams.SProjectileLauncher.ammoCost;
-					mode.PelletsPerShot = p.launchParams.SProjectileLauncher.pelletCount;
+					mode.AmmoPerShot = p.launchParams.SProjectileLauncher?.ammoCost ?? 1;
+					mode.PelletsPerShot = p.launchParams.SProjectileLauncher?.pelletCount ?? 1;
 					break;
 
 				default:
@@ -682,9 +708,9 @@ namespace Loader
 
 			var info = new StandardisedRadar
 			{
-				DetectionLifetime = radar.detectionLifetime,
-				AltitudeCeiling = radar.altitudeCeiling,
-				CrossSectionOcclusion = radar.enableCrossSectionOcclusion,
+				// DetectionLifetime = radar.detectionLifetime,
+				// AltitudeCeiling = radar.altitudeCeiling,
+				// CrossSectionOcclusion = radar.enableCrossSectionOcclusion,
 				Signatures = BuildDetectionSignatures(item)
 			};
 
@@ -702,9 +728,9 @@ namespace Loader
 			{
 				detections.Add(new StandardisedSignatureDetection
 				{
-					Detectable = detection.detectable,
+					// Detectable = detection.detectable,
 					Sensitivity = detection.sensitivity,
-					AmbientPiercing = detection.ambientPiercing
+					// AmbientPiercing = detection.ambientPiercing
 				});
 			}
 
